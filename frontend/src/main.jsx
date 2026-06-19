@@ -5,6 +5,7 @@ import 'antd/dist/reset.css';
 import AppLayout from './components/AppLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import OrganizationsPage from './pages/OrganizationsPage';
 import SystemsPage from './pages/SystemsPage';
 import ProfilesPage from './pages/ProfilesPage';
 import CompliancePage from './pages/CompliancePage';
@@ -51,6 +52,7 @@ function App() {
   if (!getToken() || !user) return <ConfigProvider theme={{ algorithm: theme.defaultAlgorithm }}><LoginPage onLogin={load} /></ConfigProvider>;
 
   let page = <DashboardPage data={data} />;
+  if (active === 'organizations') page = <OrganizationsPage />;
   if (active === 'systems') page = <SystemsPage items={data.systems} reload={load} />;
   if (active === 'profiles') page = <ProfilesPage items={data.profiles} systems={data.systems} reload={load} />;
   if (active === 'compliance') page = <CompliancePage profiles={data.profiles} />;

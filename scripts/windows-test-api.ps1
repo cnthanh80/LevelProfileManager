@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v1.9..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v2.2..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -276,3 +276,15 @@ Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/release/data-footprint" | C
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/release/readiness" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/release/uat-checklist" | ConvertTo-Json -Depth 8
 Write-Host "v2.0 release readiness test completed" -ForegroundColor Green
+
+
+Write-Host "Multi-Organization Management v2.2" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/organizations/tree" | ConvertTo-Json -Depth 12
+$orgs = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/organizations?limit=20"
+$orgs | ConvertTo-Json -Depth 8
+if ($orgs.items.Count -gt 0) {
+  $orgId = $orgs.items[0].id
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/organizations/$orgId/scope-summary" | ConvertTo-Json -Depth 10
+}
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/access-control/my-scope" | ConvertTo-Json -Depth 10
+Write-Host "v2.2 multi-organization management test completed" -ForegroundColor Green

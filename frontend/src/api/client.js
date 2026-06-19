@@ -66,6 +66,8 @@ export const api = {
   periodicReviewDashboard: () => request('/dashboard/periodic-reviews'),
 
   organizations: (params) => page('/organizations', params),
+  organizationTree: () => request('/organizations/tree'),
+  organizationScopeSummary: (id) => request(`/organizations/${id}/scope-summary`),
   createOrganization: (payload) => request('/organizations', { method: 'POST', body: JSON.stringify(payload) }),
   updateOrganization: (id, payload) => request(`/organizations/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
   deleteOrganization: (id) => request(`/organizations/${id}`, { method: 'DELETE' }),

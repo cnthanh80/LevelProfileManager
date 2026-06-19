@@ -1,8 +1,10 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.models.information_system import InformationSystem
 from app.models.level_profile import LevelProfile
+from app.models.organization import Organization
 from app.models.role import Role
 from app.models.user import User
 
@@ -22,7 +24,11 @@ def build_access_scope(db: Session, user: User) -> dict:
     can_manage_all = role_code in ADMIN_ROLES
     allowed_orgs: list[int] = []
     if user.organization_id:
-        allowed_orgs.append(user.organization_id)
+        org = db.get(Organization, user.organization_id)
+        if org and org.path:
+            allowed_orgs = list(db.scalars(select(Organization.id).where(Organization.path.like(f"{org.path}%"))).all())
+        else:
+            allowed_orgs.append(user.organization_id)
     return {
         "user_id": user.id,
         "username": user.username,
@@ -44,8 +50,10 @@ def can_access_information_system(db: Session, user: User, system: InformationSy
         return True, f"{role_code} role has cross-organization read access"
     if not user.organization_id:
         return False, "User is not assigned to an organization"
-    if system.owner_org_id == user.organization_id or system.operator_org_id == user.organization_id:
-        return True, "User organization matches owner/operator organization"
+    scope = build_access_scope(db, user)
+    allowed_orgs = set(scope.get("allowed_organization_ids", []))
+    if system.owner_org_id in allowed_orgs or system.operator_org_id in allowed_orgs:
+        return True, "User organization scope matches owner/operator organization"
     if system.manager_user_id == user.id:
         return True, "User is the assigned system manager"
     return False, "User organization is outside the resource scope"

@@ -43,7 +43,7 @@ def release_info(current_user: User = Depends(get_current_user)):
     return {
         "app_name": settings.APP_NAME,
         "app_version": settings.APP_VERSION,
-        "release_name": "MVP Release 2.0",
+        "release_name": "MVP Release 2.2",
         "environment": settings.APP_ENV,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "current_user": current_user.username,
@@ -62,6 +62,7 @@ def release_info(current_user: User = Depends(get_current_user)):
             "ldap_sso_foundation",
             "production_hardening",
             "security_hardening",
+            "multi_organization_management",
         ],
     }
 
@@ -92,12 +93,13 @@ def release_readiness(
         {"code": "NOTIFICATION_ENABLED", "name": "Notification log table exists", "passed": counts.get("notification_logs") is not None},
         {"code": "SECURITY_EVENTS", "name": "Security event table exists", "passed": counts.get("security_events") is not None},
         {"code": "SAFE_NOTIFICATION_MODE", "name": "Notification dry-run is enabled for local development", "passed": settings.NOTIFICATION_DRY_RUN},
+        {"code": "ORG_HIERARCHY", "name": "Organization hierarchy is enabled", "passed": counts.get("organizations") is not None},
     ]
     passed = sum(1 for item in checks if item["passed"])
     total = len(checks)
     score = round(passed * 100 / total, 2) if total else 0
     return {
-        "release": "2.0.0",
+        "release": "2.2.0",
         "readiness_score": score,
         "status": "READY_FOR_UAT" if score >= 80 else "NEEDS_ATTENTION",
         "passed": passed,
@@ -109,7 +111,7 @@ def release_readiness(
 @router.get("/uat-checklist")
 def uat_checklist(_=Depends(require_roles("ADMIN", "SECURITY_OFFICER", "REVIEWER"))):
     return {
-        "release": "2.0.0",
+        "release": "2.2.0",
         "checklist": [
             "Đăng nhập admin/attt và kiểm tra phân quyền cơ bản.",
             "Tạo mới hệ thống thông tin và hồ sơ đề xuất cấp độ.",
@@ -121,5 +123,6 @@ def uat_checklist(_=Depends(require_roles("ADMIN", "SECURITY_OFFICER", "REVIEWER
             "Gửi thử thông báo email/Telegram ở chế độ dry-run.",
             "Kiểm tra audit trail, security events và account lockout.",
             "Rà soát cấu hình production trước khi triển khai ngoài môi trường dev.",
+            "Kiểm tra cây tổ chức, phạm vi đơn vị và thống kê hồ sơ theo tổ chức.",
         ],
     }

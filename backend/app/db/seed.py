@@ -9,6 +9,7 @@ from app.models.role import Role
 from app.models.security_requirement import SecurityRequirement
 from app.models.user import User
 from app.services.template_engine import seed_default_templates
+from app.services.organization_service import compute_org_level_path
 
 ROLES = [
     ("ADMIN", "Quản trị hệ thống", "Toàn quyền cấu hình và quản trị người dùng"),
@@ -54,6 +55,20 @@ SAMPLE_SYSTEMS = [
 def seed() -> None:
     db = SessionLocal()
     try:
+        root_org = db.scalar(select(Organization).where(Organization.code == "NHCSXH"))
+        if not root_org:
+            root_org = Organization(
+                code="NHCSXH",
+                name="Ngân hàng Chính sách xã hội",
+                org_type="head_office",
+                description="Cấp tổ chức gốc phục vụ mô hình nhiều đơn vị",
+                manager_name="Lãnh đạo phụ trách",
+                contact_email="admin@example.com",
+            )
+            compute_org_level_path(db, root_org)
+            db.add(root_org)
+            db.flush()
+
         default_org = db.scalar(select(Organization).where(Organization.code == "TTCNTT"))
         if not default_org:
             default_org = Organization(
@@ -61,9 +76,35 @@ def seed() -> None:
                 name="Trung tâm Công nghệ thông tin",
                 org_type="internal_unit",
                 description="Đơn vị mặc định phục vụ kiểm thử MVP",
+                parent_id=root_org.id,
+                manager_name="Giám đốc TTCNTT",
+                contact_email="ttcntt@example.com",
             )
+            compute_org_level_path(db, default_org)
             db.add(default_org)
             db.flush()
+        elif not default_org.parent_id:
+            default_org.parent_id = root_org.id
+            compute_org_level_path(db, default_org)
+
+        for code, name, org_type in [
+            ("QTHT", "Phòng Quản trị hệ thống", "department"),
+            ("ATTT", "Phòng An toàn thông tin", "department"),
+            ("VANHANH", "Đơn vị vận hành nghiệp vụ", "business_unit"),
+        ]:
+            org = db.scalar(select(Organization).where(Organization.code == code))
+            if not org:
+                org = Organization(
+                    code=code,
+                    name=name,
+                    org_type=org_type,
+                    parent_id=default_org.id,
+                    description="Đơn vị mẫu trong cây tổ chức v2.2",
+                    contact_email=f"{code.lower()}@example.com",
+                )
+                compute_org_level_path(db, org)
+                db.add(org)
+                db.flush()
 
         role_map = {}
         for code, name, description in ROLES:
