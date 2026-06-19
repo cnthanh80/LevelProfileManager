@@ -16,3 +16,5 @@ from app.models.compliance_score import ComplianceScore  # noqa
 from app.models.risk_assessment import RiskAssessment  # noqa
 
 from app.models.periodic_review import PeriodicReview  # noqa
+
+from app.models.document_template import DocumentTemplate  # noqa

@@ -5,3 +5,5 @@ from app.models.notification_log import NotificationLog
 from app.models.audit_log import AuditLog
 
 from app.models.periodic_review import PeriodicReview
+
+from app.models.document_template import DocumentTemplate

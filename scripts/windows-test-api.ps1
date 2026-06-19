@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v1.5..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v1.6..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -206,3 +206,36 @@ $manualAuditBody = @{
 Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/audit-logs/manual" -Body $manualAuditBody | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/1/audit-trail" | ConvertTo-Json -Depth 8
 Write-Host "v1.5 audit trail test completed" -ForegroundColor Green
+
+
+Write-Host "Template Engine & Government Document Generator" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/government-documents/types" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/document-templates/seed-defaults" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/document-templates?limit=20" | ConvertTo-Json -Depth 8
+
+if ($profiles.items.Count -gt 0) {
+  $profileId = $profiles.items[0].id
+  Write-Host "Generate government DOCX" -ForegroundColor Cyan
+  $govDocBody = @{
+    document_type = "APPROVAL_SUBMISSION"
+    file_format = "docx"
+    agency_name = "NGAN HANG CHINH SACH XA HOI"
+    signer_title = "GIAM DOC TRUNG TAM CNTT"
+    place_name = "Ha Noi"
+  } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profiles/$profileId/government-documents/generate" -Body $govDocBody | ConvertTo-Json -Depth 8
+
+  Write-Host "Generate government PDF" -ForegroundColor Cyan
+  $govPdfBody = @{
+    document_type = "APPROVAL_DECISION"
+    file_format = "pdf"
+    agency_name = "NGAN HANG CHINH SACH XA HOI"
+    signer_title = "TONG GIAM DOC"
+    place_name = "Ha Noi"
+  } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profiles/$profileId/government-documents/generate" -Body $govPdfBody | ConvertTo-Json -Depth 8
+
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/exported-documents?profile_id=$profileId" | ConvertTo-Json -Depth 8
+}
+
+Write-Host "v1.6 template engine test completed" -ForegroundColor Green

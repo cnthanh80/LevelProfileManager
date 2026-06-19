@@ -8,6 +8,7 @@ from app.models.organization import Organization
 from app.models.role import Role
 from app.models.security_requirement import SecurityRequirement
 from app.models.user import User
+from app.services.template_engine import seed_default_templates
 
 ROLES = [
     ("ADMIN", "Quản trị hệ thống", "Toàn quyền cấu hình và quản trị người dùng"),
@@ -155,6 +156,7 @@ def seed() -> None:
                 ))
 
         db.commit()
+        seed_default_templates(db)
         print("Seed data completed")
     finally:
         db.close()
