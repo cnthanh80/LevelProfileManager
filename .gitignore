@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual env
+venv/
+.venv/
+
+# Environment
+.env
+
+# Logs
+logs/
+*.log
+
+# VSCode
+.vscode/
+
+# Jetbrains
+.idea/
+
+# Alembic cache
+alembic/__pycache__/
+
+# Build
+dist/
+build/
+
+# Uploads
+storage/uploads/
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Docker
+postgres_data/
