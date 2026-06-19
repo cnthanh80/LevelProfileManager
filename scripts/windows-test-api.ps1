@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v0.6..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v0.8..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -80,6 +80,23 @@ if ($profiles.items.Count -gt 0) {
   Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/workflow" | ConvertTo-Json -Depth 5
   Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/workflow/history" | ConvertTo-Json -Depth 5
   Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/workflow-summary" | ConvertTo-Json -Depth 5
+
+  Write-Host "Export DOCX document" -ForegroundColor Cyan
+  $exportBody = @{ document_type = "PROFILE_EXPLANATION"; file_format = "docx" } | ConvertTo-Json
+  $docxExport = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profiles/$profileId/exports" -Body $exportBody
+  $docxExport | ConvertTo-Json -Depth 5
+
+  Write-Host "Export PDF document" -ForegroundColor Cyan
+  $pdfBody = @{ document_type = "CHECKLIST_APPENDIX"; file_format = "pdf" } | ConvertTo-Json
+  $pdfExport = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profiles/$profileId/exports" -Body $pdfBody
+  $pdfExport | ConvertTo-Json -Depth 5
+
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/exported-documents?profile_id=$profileId" | ConvertTo-Json -Depth 5
 }
 
-Write-Host "v0.6 API test completed" -ForegroundColor Green
+Write-Host "Dashboard summary" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/summary" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/compliance-overview" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/evidence-gaps" | ConvertTo-Json -Depth 8
+
+Write-Host "v0.8 API test completed" -ForegroundColor Green

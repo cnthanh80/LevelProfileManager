@@ -56,3 +56,7 @@ RequireAdmin = Depends(require_roles("ADMIN"))
 RequireSecurityOfficer = Depends(require_roles("ADMIN", "SECURITY_OFFICER"))
 RequireReviewer = Depends(require_roles("ADMIN", "SECURITY_OFFICER", "REVIEWER"))
 RequireApprover = Depends(require_roles("ADMIN", "APPROVER"))
+
+# Backward-compatible alias used by dashboard endpoints.
+def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
+    return current_user
