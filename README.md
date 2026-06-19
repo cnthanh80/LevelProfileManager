@@ -1,165 +1,90 @@
-# LevelProfileManager v0.3
+# LevelProfileManager v0.4
 
 Ứng dụng web quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin.
 
-Phiên bản v0.3 kế thừa Phase 1 + Phase 2 và bổ sung:
+## v0.4 bổ sung
 
-- FastAPI backend
-- PostgreSQL 16
-- Alembic migration đầu tiên
-- CRUD `organizations`
-- CRUD `information-systems`
-- CRUD `level-profiles`
-- Auth JWT
-- RBAC cơ bản theo vai trò
-- Seed dữ liệu role/user mặc định
+- Checklist Engine.
+- Danh mục yêu cầu ATTT theo cấp độ 1-5.
+- Bảng `security_requirements`.
+- Bảng `profile_requirement_answers`.
+- API sinh checklist tự động theo cấp độ hồ sơ.
+- API cập nhật trạng thái đáp ứng checklist.
+- API thống kê tỷ lệ đáp ứng và cảnh báo tiêu chí bắt buộc chưa đáp ứng.
+- Seed dữ liệu mẫu cho 3 hệ thống cấp độ 2, 3, 4.
 
-## 1. Yêu cầu môi trường Windows
-
-- Windows 10/11
-- Docker Desktop đã cài và đang chạy
-- Docker Desktop dùng Linux containers
-- PowerShell hoặc Windows Terminal
-
-## 2. Cách chạy lần đầu
-
-Giải nén file zip, mở PowerShell tại thư mục `LevelProfileManager-v0.3`, chạy:
+## Chạy trên Windows Docker Desktop
 
 ```powershell
+cd D:\Projects\LevelProfileManager
+docker compose down
 docker compose up -d --build
 ```
 
-Hoặc chạy script:
-
-```powershell
-.\scripts\windows-run.ps1
-```
-
-## 3. Kiểm tra container
-
-```powershell
-docker compose ps
-```
-
-Xem log backend:
-
-```powershell
-docker compose logs -f backend
-```
-
-## 4. Truy cập API
-
-- Swagger UI: http://localhost:8000/docs
-- Health: http://localhost:8000/api/v1/health
-- DB Health: http://localhost:8000/api/v1/health/db
-
-## 5. Tài khoản mặc định
-
-### Quản trị hệ thống
+Mở Swagger:
 
 ```text
-username: admin
-password: Admin@123
-role: ADMIN
+http://localhost:8000/docs
 ```
 
-### Cán bộ ATTT
+## Tài khoản test
 
 ```text
-username: attt
-password: Attt@123
-role: SECURITY_OFFICER
+admin / Admin@123
+attt / Attt@123
 ```
 
-Khuyến nghị đổi mật khẩu ngay khi dùng lâu dài.
-
-## 6. Test nhanh API bằng PowerShell
+## Test nhanh
 
 ```powershell
 .\scripts\windows-test-api.ps1
 ```
 
-Script sẽ:
+## API mới trong v0.4
 
-1. Kiểm tra health API
-2. Login bằng user `admin`
-3. Gọi `/auth/me`
-4. Gọi danh sách roles/users
-5. Gọi các API CRUD nền tảng
+```http
+GET  /api/v1/security-requirements
+GET  /api/v1/security-requirements/by-level/{level}
+POST /api/v1/security-requirements
+PUT  /api/v1/security-requirements/{requirement_id}
+DELETE /api/v1/security-requirements/{requirement_id}
 
-## 7. Cách login trên Swagger
-
-1. Mở http://localhost:8000/docs
-2. Bấm nút **Authorize**
-3. Nhập:
-
-```text
-username: admin
-password: Admin@123
+POST /api/v1/profiles/{profile_id}/generate-checklist
+GET  /api/v1/profiles/{profile_id}/checklist
+PUT  /api/v1/checklist-answers/{answer_id}
+GET  /api/v1/profiles/{profile_id}/compliance-summary
 ```
 
-4. Sau đó thử các API cần quyền như:
+## Quy trình upgrade từ v0.3 lên v0.4 bằng Git
 
-```text
-GET /api/v1/users
-POST /api/v1/organizations
-POST /api/v1/information-systems
-POST /api/v1/level-profiles
+Trước khi giải nén đè:
+
+```powershell
+git status
+git add .
+git commit -m "Backup before upgrade to v0.4"
+git push
 ```
 
-## 8. Vai trò RBAC hiện có
+Giải nén nội dung `LevelProfileManager-v0.4.zip` đè vào thư mục project hiện tại.
 
-| Role code | Tên vai trò |
-|---|---|
-| ADMIN | Quản trị hệ thống |
-| SECURITY_OFFICER | Cán bộ ATTT |
-| OPERATOR | Đơn vị vận hành |
-| REVIEWER | Người rà soát |
-| APPROVER | Lãnh đạo phê duyệt |
-| REPORT_VIEWER | Người xem báo cáo |
+Sau khi test OK:
 
-Quyền hiện tại:
+```powershell
+git add .
+git commit -m "Upgrade to v0.4 - checklist engine"
+git tag v0.4
+git push
+git push origin v0.4
+```
 
-- `ADMIN`: quản trị user, xóa dữ liệu, toàn quyền thao tác
-- `SECURITY_OFFICER`: tạo/cập nhật tổ chức, hệ thống, hồ sơ
-- `OPERATOR`: tạo/cập nhật hệ thống thông tin
-- Các vai trò còn lại được seed trước để phục vụ Phase workflow sau
+## Lưu ý database
 
-## 9. Reset môi trường local
+Nếu anh đang dùng volume PostgreSQL từ v0.3, Alembic sẽ tự chạy migration `0002_checklist_engine` khi backend khởi động.
 
-Cẩn thận: lệnh này xóa toàn bộ dữ liệu PostgreSQL local của project.
+Nếu muốn reset sạch dữ liệu test:
 
 ```powershell
 docker compose down -v
 docker compose up -d --build
 ```
-
-## 10. Kiểm tra bảng DB
-
-```powershell
-docker exec -it lpm_postgres psql -U lpm_user -d level_profile_db
-```
-
-Trong psql:
-
-```sql
-\dt
-select id, code, name from roles order by id;
-select id, username, full_name, role_id from users order by id;
-```
-
-Thoát:
-
-```sql
-\q
-```
-
-## 11. Ghi chú phát triển tiếp theo
-
-Phase 4 nên triển khai:
-
-- Checklist engine
-- Bảng `security_requirements`
-- Bảng `profile_requirement_answers`
-- Seed checklist yêu cầu quản lý/kỹ thuật theo cấp độ
-- API trả tỷ lệ đáp ứng theo từng hồ sơ

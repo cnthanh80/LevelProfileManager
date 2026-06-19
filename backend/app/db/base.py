@@ -5,3 +5,5 @@ from app.models.organization import Organization  # noqa
 from app.models.information_system import InformationSystem  # noqa
 from app.models.level_profile import LevelProfile  # noqa
 from app.models.workflow_history import ProfileWorkflowHistory  # noqa
+from app.models.security_requirement import SecurityRequirement  # noqa
+from app.models.profile_requirement_answer import ProfileRequirementAnswer  # noqa

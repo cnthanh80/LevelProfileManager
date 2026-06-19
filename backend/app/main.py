@@ -6,7 +6,7 @@ from app.core.config import settings
 
 app = FastAPI(
     title=settings.APP_NAME,
-    version="0.3.0",
+    version="0.4.0",
     description="Ứng dụng quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin",
 )
 
