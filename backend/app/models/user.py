@@ -1,4 +1,5 @@
-from sqlalchemy import Boolean, ForeignKey, String
+from datetime import datetime
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base, TimestampMixin
 
@@ -17,3 +18,9 @@ class User(Base, TimestampMixin):
     auth_provider: Mapped[str] = mapped_column(String(50), default="LOCAL", nullable=False)
     external_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
     is_local_auth_allowed: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+    failed_login_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    password_changed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    must_change_password: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

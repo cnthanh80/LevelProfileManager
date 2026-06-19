@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v1.7..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v1.9..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -259,3 +259,13 @@ Invoke-RestMethod "$BaseUrl/api/v1/health/readiness" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/system/runtime" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/system/production-checklist" | ConvertTo-Json -Depth 8
 Write-Host "v1.8 production hardening test completed" -ForegroundColor Green
+
+Write-Host "Security Hardening" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/security/password-policy" | ConvertTo-Json -Depth 8
+$weakPasswordBody = @{ password = "abc" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/security/password-policy/validate" -Body $weakPasswordBody | ConvertTo-Json -Depth 8
+$strongPasswordBody = @{ password = "Strong@123" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/security/password-policy/validate" -Body $strongPasswordBody | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/security/summary" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/security/events?limit=10" | ConvertTo-Json -Depth 8
+Write-Host "v1.9 security hardening test completed" -ForegroundColor Green

@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr
 
 
@@ -28,6 +29,10 @@ class UserRead(BaseModel):
     auth_provider: str = "LOCAL"
     external_id: str | None = None
     is_local_auth_allowed: bool = True
+    failed_login_count: int = 0
+    locked_until: datetime | None = None
+    last_login_at: datetime | None = None
+    must_change_password: bool = False
 
 
 class UserCreate(BaseModel):
@@ -41,6 +46,10 @@ class UserCreate(BaseModel):
     auth_provider: str = "LOCAL"
     external_id: str | None = None
     is_local_auth_allowed: bool = True
+    failed_login_count: int = 0
+    locked_until: datetime | None = None
+    last_login_at: datetime | None = None
+    must_change_password: bool = False
 
 
 class ChangePasswordRequest(BaseModel):

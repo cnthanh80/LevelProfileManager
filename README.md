@@ -1,22 +1,18 @@
-# LevelProfileManager v1.8
+# LevelProfileManager v1.9
 
-Ứng dụng web quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin.
+Phase 19 – Security Hardening Foundation.
 
-## Phase 18 - Production Hardening Foundation
+## Nội dung mới
 
-Bản v1.8 kế thừa v1.7 và bổ sung nền tảng hardening cho triển khai nội bộ/production:
+- Chính sách mật khẩu tập trung.
+- Kiểm tra độ mạnh mật khẩu.
+- Ghi nhận sự kiện bảo mật: đăng nhập thành công/thất bại, khóa/mở khóa tài khoản.
+- Khóa tài khoản tạm thời sau nhiều lần đăng nhập sai.
+- API tổng hợp security summary.
+- API danh sách security events.
+- API mở khóa tài khoản cho ADMIN.
 
-- Request ID middleware: tự sinh `X-Request-ID` cho mỗi request.
-- Security headers middleware: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cache-Control`.
-- CORS cấu hình qua `.env`, không mở `*` mặc định.
-- Rate limit middleware dạng in-memory, tắt mặc định cho local dev, bật được bằng `.env`.
-- Health endpoints chuẩn vận hành: `/health/liveness`, `/health/readiness`.
-- System runtime endpoint cho ADMIN.
-- Production checklist endpoint cho ADMIN.
-- File mẫu `.env.production.example`.
-- `docker-compose.prod.yml` tham khảo cho môi trường production nội bộ.
-
-## Chạy local trên Windows Docker Desktop
+## Chạy trên Windows Docker Desktop
 
 ```powershell
 cd D:\Projects\LevelProfileManager
@@ -25,30 +21,23 @@ docker compose up -d --build
 .\scripts\windows-test-api.ps1
 ```
 
-## API mới
+## API chính
 
 ```text
-GET /api/v1/health/liveness
-GET /api/v1/health/readiness
-GET /api/v1/system/runtime
-GET /api/v1/system/production-checklist
+GET  /api/v1/security/password-policy
+POST /api/v1/security/password-policy/validate
+GET  /api/v1/security/summary
+GET  /api/v1/security/events
+POST /api/v1/security/events
+POST /api/v1/users/{user_id}/security/unlock
 ```
 
-Hai API `/system/*` yêu cầu tài khoản ADMIN.
-
-## Tài khoản test
-
-```text
-admin / Admin@123
-attt / Attt@123
-```
-
-## Gợi ý Git
+## Git
 
 ```powershell
 git add .
-git commit -m "Upgrade to v1.8 - production hardening foundation"
-git tag v1.8
+git commit -m "Upgrade to v1.9 - security hardening foundation"
+git tag v1.9
 git push
-git push origin v1.8
+git push origin v1.9
 ```

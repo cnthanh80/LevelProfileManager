@@ -1,6 +1,6 @@
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -12,22 +12,29 @@ from app.db.session import get_db
 from app.models.role import Role
 from app.models.user import User
 from app.schemas.auth import ChangePasswordRequest, IdentityProviderStatus, LdapLoginRequest, RoleRead, SsoLoginHint, Token, UserRead
+from app.services.security_hardening_service import is_user_locked, register_failed_login, register_successful_login, validate_password_policy
 
 router = APIRouter()
 
 
 @router.post("/login", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.scalar(select(User).where(User.username == form_data.username))
+    client_ip = request.client.host if request.client else None
+    user_agent = request.headers.get("user-agent")
     if not user or not user.is_local_auth_allowed or not verify_password(form_data.password, user.hashed_password):
+        register_failed_login(db, form_data.username, ip_address=client_ip, user_agent=user_agent)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    if is_user_locked(user):
+        raise HTTPException(status_code=status.HTTP_423_LOCKED, detail="Account is temporarily locked due to failed login attempts")
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
 
+    register_successful_login(db, user, ip_address=client_ip, user_agent=user_agent)
     role = db.get(Role, user.role_id) if user.role_id else None
     access_token = create_access_token(
         subject=user.username,
@@ -111,6 +118,11 @@ def change_password(
 ):
     if not verify_password(payload.old_password, current_user.hashed_password):
         raise HTTPException(status_code=400, detail="Old password is incorrect")
+    valid, score, issues = validate_password_policy(payload.new_password)
+    if not valid:
+        raise HTTPException(status_code=400, detail={"message": "Password does not meet policy", "score": score, "issues": issues})
     current_user.hashed_password = get_password_hash(payload.new_password)
+    current_user.password_changed_at = datetime.now(timezone.utc)
+    current_user.must_change_password = False
     db.commit()
-    return {"status": "ok"}
+    return {"status": "ok", "password_score": score}

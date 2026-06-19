@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Level Profile Manager"
     APP_ENV: str = "development"
     API_V1_PREFIX: str = "/api/v1"
-    APP_VERSION: str = "1.8.0"
+    APP_VERSION: str = "1.9.0"
     DEBUG: bool = False
     DATABASE_URL: str
     JWT_SECRET_KEY: str
@@ -21,6 +21,17 @@ class Settings(BaseSettings):
     RATE_LIMIT_REQUESTS_PER_MINUTE: int = 120
     RATE_LIMIT_EXCLUDE_PATHS: str = "/api/v1/health,/docs,/openapi.json"
     SERVER_TIMEZONE: str = "Asia/Ho_Chi_Minh"
+
+    # Phase 19 - security hardening.
+    PASSWORD_MIN_LENGTH: int = 8
+    PASSWORD_REQUIRE_UPPERCASE: bool = True
+    PASSWORD_REQUIRE_LOWERCASE: bool = True
+    PASSWORD_REQUIRE_DIGIT: bool = True
+    PASSWORD_REQUIRE_SPECIAL: bool = True
+    ACCOUNT_LOCKOUT_ENABLED: bool = True
+    ACCOUNT_LOCKOUT_THRESHOLD: int = 5
+    ACCOUNT_LOCKOUT_MINUTES: int = 15
+    SECURITY_EVENT_RETENTION_DAYS: int = 365
 
     # Notification engine - safe by default for local development.
     # When NOTIFICATION_DRY_RUN=true, messages are not sent to SMTP/Telegram,
