@@ -20,3 +20,6 @@ from app.models.periodic_review import PeriodicReview  # noqa
 from app.models.document_template import DocumentTemplate  # noqa
 
 from app.models.security_event import SecurityEvent  # noqa
+
+from app.models.profile_version import ProfileVersion  # noqa
+from app.models.profile_signature import ProfileSignature  # noqa

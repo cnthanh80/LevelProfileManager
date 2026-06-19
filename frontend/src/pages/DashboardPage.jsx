@@ -1,3 +1,4 @@
+import React from 'react';
 import { Alert, Card, Col, Progress, Row, Statistic, Table, Typography } from 'antd';
 import PageHeader from '../components/PageHeader';
 import StatusTag from '../components/StatusTag';

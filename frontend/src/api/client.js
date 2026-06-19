@@ -142,6 +142,15 @@ export const api = {
   releaseReadiness: () => request('/release/readiness'),
   uatChecklist: () => request('/release/uat-checklist'),
   dataFootprint: () => request('/release/data-footprint'),
+
+
+  dossierSummary: (profileId) => request(`/profiles/${profileId}/dossier/summary`),
+  profileVersions: (profileId, params) => page(`/profiles/${profileId}/versions`, params),
+  createProfileVersion: (profileId, payload) => request(`/profiles/${profileId}/versions`, { method: 'POST', body: JSON.stringify(payload || {}) }),
+  profileVersion: (versionId) => request(`/profile-versions/${versionId}`),
+  compareProfileVersions: (fromVersionId, toVersionId) => request(`/profile-versions/compare?from_version_id=${fromVersionId}&to_version_id=${toVersionId}`),
+  signProfileVersion: (versionId, payload) => request(`/profile-versions/${versionId}/sign`, { method: 'POST', body: JSON.stringify(payload || {}) }),
+  profileSignatures: (profileId, params) => page(`/profiles/${profileId}/signatures`, params),
   runtime: () => request('/system/runtime'),
   productionChecklist: () => request('/system/production-checklist'),
 };

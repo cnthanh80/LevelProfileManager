@@ -1,5 +1,5 @@
 import { Card, Col, Row, Table } from 'antd';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PageHeader from '../components/PageHeader';
 import JsonView from '../components/JsonView';
 import StatusTag from '../components/StatusTag';

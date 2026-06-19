@@ -1,6 +1,6 @@
 import { Alert, Button, Card, Divider, Form, Input, Space, Typography } from 'antd';
 import { SafetyCertificateOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { login, api } from '../api/client';
 
 export default function LoginPage({ onLogin }) {

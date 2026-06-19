@@ -1,3 +1,4 @@
+import React from 'react';
 import { Space, Typography } from 'antd';
 
 export default function PageHeader({ title, subtitle, actions }) {

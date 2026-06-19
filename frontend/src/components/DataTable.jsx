@@ -1,5 +1,5 @@
 import { Alert, Card, Input, Space, Table } from 'antd';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 export default function DataTable({ title, data, columns, rowKey = 'id', loading, error, extra, searchable = true }) {
   const [q, setQ] = useState('');

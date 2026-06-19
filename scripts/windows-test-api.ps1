@@ -288,3 +288,38 @@ if ($orgs.items.Count -gt 0) {
 }
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/access-control/my-scope" | ConvertTo-Json -Depth 10
 Write-Host "v2.2 multi-organization management test completed" -ForegroundColor Green
+
+Write-Host "Digital Signature & Electronic Dossier v2.3" -ForegroundColor Cyan
+if ($profiles.items.Count -gt 0) {
+  $profileId = $profiles.items[0].id
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/dossier/summary" | ConvertTo-Json -Depth 8
+
+  $versionBody1 = @{
+    title = "Ho so dien tu ban 1"
+    change_summary = "Tao phien ban ho so dien tu tu script v2.3"
+  } | ConvertTo-Json
+  $v1 = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profiles/$profileId/versions" -Body $versionBody1
+  $v1 | ConvertTo-Json -Depth 8
+
+  $versionBody2 = @{
+    title = "Ho so dien tu ban 2"
+    change_summary = "Tao phien ban thu hai de kiem tra compare"
+  } | ConvertTo-Json
+  $v2 = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profiles/$profileId/versions" -Body $versionBody2
+  $v2 | ConvertTo-Json -Depth 8
+
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/versions" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profile-versions/$($v2.id)" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profile-versions/compare?from_version_id=$($v1.id)&to_version_id=$($v2.id)" | ConvertTo-Json -Depth 8
+
+  $signBody = @{
+    signer_role = "Lanh dao phe duyet"
+    sign_method = "MOCK"
+    comment = "Ky so mo phong tu script v2.3"
+  } | ConvertTo-Json
+  $sig = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profile-versions/$($v2.id)/sign" -Body $signBody
+  $sig | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/signatures" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/dossier/summary" | ConvertTo-Json -Depth 8
+}
+Write-Host "v2.3 digital signature and electronic dossier test completed" -ForegroundColor Green
