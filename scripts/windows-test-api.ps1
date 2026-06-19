@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v1.3..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v1.4..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -154,6 +154,28 @@ Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/audit-logs?limit=10" | Conv
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/periodic-reviews" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/periodic-reviews/send-reminders?days=30&recipient=attt@example.com" | ConvertTo-Json -Depth 8
 
+
+Write-Host "Notification runtime status" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/notifications/runtime-status" | ConvertTo-Json -Depth 8
+
+Write-Host "Send EMAIL dry-run notification" -ForegroundColor Cyan
+$emailBody = @{
+  event_type = "EMAIL_TEST"
+  recipient = "admin@example.com"
+  subject = "Email test v1.4"
+  message = "Day la email dry-run tu Notification Engine v1.4"
+} | ConvertTo-Json
+Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/notifications/send-email-test" -Body $emailBody | ConvertTo-Json -Depth 5
+
+Write-Host "Send TELEGRAM dry-run notification" -ForegroundColor Cyan
+$telegramBody = @{
+  event_type = "TELEGRAM_TEST"
+  recipient = "000000000"
+  subject = "Telegram test v1.4"
+  message = "Day la Telegram dry-run tu Notification Engine v1.4"
+} | ConvertTo-Json
+Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/notifications/send-telegram-test" -Body $telegramBody | ConvertTo-Json -Depth 5
+
 Write-Host "Enterprise Dashboard" -ForegroundColor Cyan
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/enterprise/overview" | ConvertTo-Json -Depth 10
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/enterprise/level-matrix" | ConvertTo-Json -Depth 10
@@ -161,7 +183,7 @@ Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/enterprise/compli
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/enterprise/action-board" | ConvertTo-Json -Depth 10
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/enterprise/executive-report" | ConvertTo-Json -Depth 10
 
-Write-Host "v1.3 API test completed" -ForegroundColor Green
+Write-Host "v1.4 API test completed" -ForegroundColor Green
 
 Write-Host "Frontend health" -ForegroundColor Cyan
 try {

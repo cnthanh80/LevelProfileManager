@@ -18,6 +18,12 @@ class ProfileReminderCreate(BaseModel):
     message: str | None = None
 
 
+class BulkReminderRequest(BaseModel):
+    channel: str = "IN_APP"
+    recipient: str = "attt@example.com"
+    days: int = Field(default=30, ge=1, le=365)
+
+
 class NotificationLogRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -43,3 +49,8 @@ class NotificationSummary(BaseModel):
     failed: int
     by_channel: dict[str, int] = Field(default_factory=dict)
     by_event_type: dict[str, int] = Field(default_factory=dict)
+
+
+class NotificationRuntimeStatus(BaseModel):
+    dry_run: bool
+    channels: dict
