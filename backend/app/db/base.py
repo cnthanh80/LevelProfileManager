@@ -14,3 +14,5 @@ from app.models.audit_log import AuditLog  # noqa
 from app.models.profile_assessment import ProfileAssessment  # noqa
 from app.models.compliance_score import ComplianceScore  # noqa
 from app.models.risk_assessment import RiskAssessment  # noqa
+
+from app.models.periodic_review import PeriodicReview  # noqa

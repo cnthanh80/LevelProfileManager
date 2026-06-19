@@ -1,31 +1,28 @@
-# LevelProfileManager v1.1
+# LevelProfileManager v1.2
 
-Phase 11 - Compliance Engine.
+Phase 12 - Periodic Review Engine.
 
 ## Tính năng mới
 
-- Gợi ý cấp độ tự động từ thông tin hồ sơ và hệ thống thông tin.
-- API phân loại cấp độ theo bộ tiêu chí đầu vào.
-- Gap Analysis: xác định yêu cầu bắt buộc/chưa đáp ứng.
-- Compliance Score: điểm quản lý, kỹ thuật, tổng thể.
-- Risk Assessment: điểm rủi ro và khuyến nghị xử lý.
-- Readiness Assessment: đánh giá sẵn sàng gửi thẩm định.
-- Lưu lịch sử đánh giá vào `profile_assessments`, `compliance_scores`, `risk_assessments`.
-- Dashboard compliance tổng hợp.
+- Quản lý lịch rà soát định kỳ hồ sơ đề xuất cấp độ.
+- Tạo lịch rà soát thủ công theo từng hồ sơ.
+- Tự động sinh lịch rà soát tiếp theo theo chu kỳ tháng.
+- Theo dõi trạng thái: PLANNED, IN_PROGRESS, COMPLETED, CANCELLED.
+- Danh sách hồ sơ đến hạn/sắp đến hạn rà soát.
+- Hoàn thành rà soát kèm kết luận và phương án xử lý.
+- Tạo thông báo nhắc rà soát định kỳ.
+- Dashboard tổng hợp rà soát định kỳ.
 
 ## API chính
 
-```text
-POST /api/v1/compliance/classify-level
-GET  /api/v1/profiles/{id}/compliance/suggest-level
-GET  /api/v1/profiles/{id}/compliance/gap-analysis
-GET  /api/v1/profiles/{id}/compliance/score
-GET  /api/v1/profiles/{id}/compliance/risk
-GET  /api/v1/profiles/{id}/compliance/readiness
-POST /api/v1/profiles/{id}/compliance/run-assessment
-GET  /api/v1/profiles/{id}/compliance/assessments
-GET  /api/v1/dashboard/compliance
-```
+- POST `/api/v1/profiles/{profile_id}/periodic-reviews`
+- POST `/api/v1/profiles/{profile_id}/periodic-reviews/generate-next`
+- GET `/api/v1/profiles/{profile_id}/periodic-reviews`
+- GET `/api/v1/periodic-reviews/due-soon?days=30`
+- PUT `/api/v1/periodic-reviews/{review_id}`
+- POST `/api/v1/periodic-reviews/{review_id}/complete`
+- POST `/api/v1/periodic-reviews/send-reminders?days=30&recipient=attt@example.com`
+- GET `/api/v1/dashboard/periodic-reviews`
 
 ## Chạy trên Windows Docker Desktop
 
@@ -36,12 +33,17 @@ docker compose up -d --build
 .\scripts\windows-test-api.ps1
 ```
 
+## Tài khoản test
+
+- `admin / Admin@123`
+- `attt / Attt@123`
+
 ## Git
 
 ```powershell
 git add .
-git commit -m "Upgrade to v1.1 - compliance engine"
-git tag v1.1
+git commit -m "Upgrade to v1.2 - periodic review engine"
+git tag v1.2
 git push
-git push origin v1.1
+git push origin v1.2
 ```

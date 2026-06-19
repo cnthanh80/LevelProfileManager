@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v1.1..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v1.2..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -100,6 +100,20 @@ if ($profiles.items.Count -gt 0) {
   Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/compliance/risk" | ConvertTo-Json -Depth 8
   Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/compliance/readiness" | ConvertTo-Json -Depth 8
   Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/profiles/$profileId/compliance/run-assessment" | ConvertTo-Json -Depth 8
+  Write-Host "Periodic Review Engine" -ForegroundColor Cyan
+  $dueDate = (Get-Date).AddDays(20).ToString("yyyy-MM-dd")
+  $reviewBody = @{
+    review_type = "ANNUAL"
+    due_date = $dueDate
+    note = "Lich ra soat dinh ky tao tu script v1.2"
+  } | ConvertTo-Json
+  $review = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profiles/$profileId/periodic-reviews" -Body $reviewBody
+  $review | ConvertTo-Json -Depth 6
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/periodic-reviews" | ConvertTo-Json -Depth 6
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/periodic-reviews/due-soon?days=30" | ConvertTo-Json -Depth 6
+  $completeBody = @{ findings = "Da ra soat thanh cong tu script v1.2"; action_plan = "Tiep tuc theo doi va cap nhat ho so khi co thay doi" } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/periodic-reviews/$($review.id)/complete" -Body $completeBody | ConvertTo-Json -Depth 6
+
 }
 
 
@@ -137,7 +151,10 @@ if ($profiles.items.Count -gt 0) {
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/notifications?limit=10" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/audit-logs?limit=10" | ConvertTo-Json -Depth 8
 
-Write-Host "v1.1 API test completed" -ForegroundColor Green
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/periodic-reviews" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/periodic-reviews/send-reminders?days=30&recipient=attt@example.com" | ConvertTo-Json -Depth 8
+
+Write-Host "v1.2 API test completed" -ForegroundColor Green
 
 Write-Host "Frontend health" -ForegroundColor Cyan
 try {
