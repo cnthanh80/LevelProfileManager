@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import auth, checklists, evidence_documents, health, information_systems, level_profiles, organizations, security_requirements, users
+from app.api.v1.endpoints import auth, checklists, evidence_documents, health, information_systems, level_profiles, organizations, security_requirements, users, workflow
 
 api_router = APIRouter()
 api_router.include_router(health.router, prefix="/health", tags=["health"])
@@ -11,3 +11,4 @@ api_router.include_router(level_profiles.router, prefix="/level-profiles", tags=
 api_router.include_router(security_requirements.router, prefix="/security-requirements", tags=["security-requirements"])
 api_router.include_router(checklists.router, tags=["profile-checklists"])
 api_router.include_router(evidence_documents.router, tags=["evidence-documents"])
+api_router.include_router(workflow.router, tags=["workflow"])

@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v0.5..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v0.6..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -19,7 +19,7 @@ Write-Host "Login OK" -ForegroundColor Green
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/auth/me" | ConvertTo-Json
 
 Write-Host "Profiles" -ForegroundColor Cyan
-$profiles = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/level-profiles?limit=5"
+$profiles = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/level-profiles?limit=10"
 $profiles | ConvertTo-Json -Depth 5
 
 if ($profiles.items.Count -gt 0) {
@@ -37,8 +37,6 @@ if ($profiles.items.Count -gt 0) {
   $tmpFile = Join-Path $env:TEMP "lpm-evidence-sample.pdf"
   "Tai lieu minh chung mau cho ho so de xuat cap do" | Out-File -Encoding utf8 $tmpFile
 
-  # PowerShell 5.1 does not support Invoke-RestMethod -Form.
-  # Use Windows curl.exe for multipart/form-data upload.
   $curlArgs = @(
     "-sS",
     "-X", "POST",
@@ -63,6 +61,25 @@ if ($profiles.items.Count -gt 0) {
 
   Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/evidence-documents?profile_id=$profileId" | ConvertTo-Json -Depth 5
   Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/evidence-documents" | ConvertTo-Json -Depth 5
+
+  Write-Host "Workflow current state" -ForegroundColor Cyan
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/workflow" | ConvertTo-Json -Depth 5
+
+  Write-Host "Create workflow comment" -ForegroundColor Cyan
+  $commentBody = @{ comment = "Kiem tra workflow comment tu script v0.6"; action = "comment" } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profiles/$profileId/comments" -Body $commentBody | ConvertTo-Json -Depth 5
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/comments" | ConvertTo-Json -Depth 5
+
+  $workflow = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/workflow"
+  if ($workflow.allowed_actions -contains "submit_internal_review") {
+    Write-Host "Transition submit_internal_review" -ForegroundColor Cyan
+    $transitionBody = @{ action = "submit_internal_review"; comment = "Gui ra soat noi bo tu script v0.6" } | ConvertTo-Json
+    Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profiles/$profileId/workflow/transition" -Body $transitionBody | ConvertTo-Json -Depth 5
+  }
+
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/workflow" | ConvertTo-Json -Depth 5
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/workflow/history" | ConvertTo-Json -Depth 5
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/workflow-summary" | ConvertTo-Json -Depth 5
 }
 
-Write-Host "v0.5 API test completed" -ForegroundColor Green
+Write-Host "v0.6 API test completed" -ForegroundColor Green

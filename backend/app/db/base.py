@@ -8,3 +8,4 @@ from app.models.workflow_history import ProfileWorkflowHistory  # noqa
 from app.models.security_requirement import SecurityRequirement  # noqa
 from app.models.profile_requirement_answer import ProfileRequirementAnswer  # noqa
 from app.models.evidence_document import EvidenceDocument  # noqa
+from app.models.approval_comment import ApprovalComment  # noqa
