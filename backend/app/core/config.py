@@ -5,11 +5,22 @@ class Settings(BaseSettings):
     APP_NAME: str = "Level Profile Manager"
     APP_ENV: str = "development"
     API_V1_PREFIX: str = "/api/v1"
+    APP_VERSION: str = "1.8.0"
+    DEBUG: bool = False
     DATABASE_URL: str
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 120
     FILE_STORAGE_PATH: str = "/app/storage/uploads"
+
+    # Phase 18 - production hardening. Safe defaults for local Docker Desktop.
+    CORS_ALLOWED_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
+    SECURITY_HEADERS_ENABLED: bool = True
+    REQUEST_ID_HEADER: str = "X-Request-ID"
+    RATE_LIMIT_ENABLED: bool = False
+    RATE_LIMIT_REQUESTS_PER_MINUTE: int = 120
+    RATE_LIMIT_EXCLUDE_PATHS: str = "/api/v1/health,/docs,/openapi.json"
+    SERVER_TIMEZONE: str = "Asia/Ho_Chi_Minh"
 
     # Notification engine - safe by default for local development.
     # When NOTIFICATION_DRY_RUN=true, messages are not sent to SMTP/Telegram,
@@ -52,3 +63,13 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def get_cors_origins() -> list[str]:
+    raw = settings.CORS_ALLOWED_ORIGINS or ""
+    return [item.strip() for item in raw.split(",") if item.strip()]
+
+
+def get_rate_limit_exclude_paths() -> list[str]:
+    raw = settings.RATE_LIMIT_EXCLUDE_PATHS or ""
+    return [item.strip() for item in raw.split(",") if item.strip()]

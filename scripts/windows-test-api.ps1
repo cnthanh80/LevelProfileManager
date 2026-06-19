@@ -252,3 +252,10 @@ if ($profiles.items.Count -gt 0) {
   Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/access-check" | ConvertTo-Json -Depth 8
 }
 Write-Host "v1.7 LDAP/SSO foundation test completed" -ForegroundColor Green
+
+Write-Host "Production Hardening" -ForegroundColor Cyan
+Invoke-RestMethod "$BaseUrl/api/v1/health/liveness" | ConvertTo-Json -Depth 8
+Invoke-RestMethod "$BaseUrl/api/v1/health/readiness" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/system/runtime" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/system/production-checklist" | ConvertTo-Json -Depth 8
+Write-Host "v1.8 production hardening test completed" -ForegroundColor Green

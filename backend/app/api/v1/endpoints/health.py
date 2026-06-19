@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from datetime import datetime, timezone
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -22,3 +23,20 @@ def health_check():
 def database_health_check(db: Session = Depends(get_db)):
     db.execute(text("SELECT 1"))
     return {"status": "ok", "database": "connected"}
+
+
+
+@router.get("/liveness")
+def liveness_check():
+    return {"status": "alive", "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.get("/readiness")
+def readiness_check(db: Session = Depends(get_db)):
+    db.execute(text("SELECT 1"))
+    return {
+        "status": "ready",
+        "database": "connected",
+        "app_version": settings.APP_VERSION,
+        "environment": settings.APP_ENV,
+    }

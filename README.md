@@ -1,21 +1,22 @@
-# LevelProfileManager v1.7
+# LevelProfileManager v1.8
 
-Phase 16 – Template Engine & Government Document Generator.
+Ứng dụng web quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin.
 
-## Nội dung chính
+## Phase 18 - Production Hardening Foundation
 
-- Quản lý danh mục mẫu văn bản (`document_templates`).
-- Seed mẫu văn bản mặc định cho hồ sơ đề xuất cấp độ.
-- Sinh văn bản hành chính dạng DOCX/PDF:
-  - Thuyết minh hồ sơ đề xuất cấp độ.
-  - Công văn xin ý kiến chuyên môn.
-  - Tờ trình phê duyệt.
-  - Quyết định phê duyệt.
-  - Phụ lục checklist đáp ứng yêu cầu ATTT.
-- Lưu lịch sử file sinh ra trong `exported_documents`.
-- API tải file vẫn dùng endpoint `/api/v1/exported-documents/{id}/download`.
+Bản v1.8 kế thừa v1.7 và bổ sung nền tảng hardening cho triển khai nội bộ/production:
 
-## Chạy trên Windows Docker Desktop
+- Request ID middleware: tự sinh `X-Request-ID` cho mỗi request.
+- Security headers middleware: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cache-Control`.
+- CORS cấu hình qua `.env`, không mở `*` mặc định.
+- Rate limit middleware dạng in-memory, tắt mặc định cho local dev, bật được bằng `.env`.
+- Health endpoints chuẩn vận hành: `/health/liveness`, `/health/readiness`.
+- System runtime endpoint cho ADMIN.
+- Production checklist endpoint cho ADMIN.
+- File mẫu `.env.production.example`.
+- `docker-compose.prod.yml` tham khảo cho môi trường production nội bộ.
+
+## Chạy local trên Windows Docker Desktop
 
 ```powershell
 cd D:\Projects\LevelProfileManager
@@ -27,57 +28,27 @@ docker compose up -d --build
 ## API mới
 
 ```text
-GET  /api/v1/document-templates
-POST /api/v1/document-templates
-GET  /api/v1/document-templates/{template_id}
-PUT  /api/v1/document-templates/{template_id}
-POST /api/v1/document-templates/seed-defaults
-GET  /api/v1/government-documents/types
-POST /api/v1/profiles/{profile_id}/government-documents/generate
+GET /api/v1/health/liveness
+GET /api/v1/health/readiness
+GET /api/v1/system/runtime
+GET /api/v1/system/production-checklist
 ```
 
-## Ví dụ sinh công văn/tờ trình
+Hai API `/system/*` yêu cầu tài khoản ADMIN.
 
-```json
-{
-  "document_type": "APPROVAL_SUBMISSION",
-  "file_format": "docx",
-  "agency_name": "NGÂN HÀNG CHÍNH SÁCH XÃ HỘI",
-  "signer_title": "GIÁM ĐỐC TRUNG TÂM CNTT",
-  "place_name": "Hà Nội"
-}
+## Tài khoản test
+
+```text
+admin / Admin@123
+attt / Attt@123
 ```
 
-## Git
+## Gợi ý Git
 
 ```powershell
 git add .
-git commit -m "Upgrade to v1.7 - template engine government document generator"
-git tag v1.7
+git commit -m "Upgrade to v1.8 - production hardening foundation"
+git tag v1.8
 git push
-git push origin v1.7
-```
-
-
-## v1.7 - LDAP/SSO Foundation & Organization Access Control
-
-Bổ sung nền tảng tích hợp định danh nội bộ:
-
-- Cấu hình LDAP/SSO trong backend settings.
-- API kiểm tra trạng thái identity provider.
-- API LDAP dry-run login để test quy trình trước khi nối AD/LDAP thật.
-- Mở rộng bảng `users` với `auth_provider`, `external_id`, `is_local_auth_allowed`.
-- Nền tảng phân quyền theo đơn vị/tổ chức.
-- API kiểm tra phạm vi truy cập hồ sơ và hệ thống thông tin.
-
-Endpoint mới:
-
-```text
-GET  /api/v1/auth/identity-provider/status
-GET  /api/v1/auth/sso/login-hint
-POST /api/v1/auth/ldap-login
-GET  /api/v1/access-control/my-scope
-GET  /api/v1/access-control/policy
-GET  /api/v1/information-systems/{id}/access-check
-GET  /api/v1/profiles/{id}/access-check
+git push origin v1.8
 ```
