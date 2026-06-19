@@ -77,7 +77,7 @@ def seed() -> None:
         if not admin:
             admin = User(
                 username="admin",
-                email="admin@example.local",
+                email="admin@example.com",
                 full_name="Quản trị hệ thống",
                 hashed_password=get_password_hash("Admin@123"),
                 role_id=role_map["ADMIN"].id,
@@ -91,7 +91,7 @@ def seed() -> None:
         if not officer:
             officer = User(
                 username="attt",
-                email="attt@example.local",
+                email="attt@example.com",
                 full_name="Cán bộ an toàn thông tin",
                 hashed_password=get_password_hash("Attt@123"),
                 role_id=role_map["SECURITY_OFFICER"].id,

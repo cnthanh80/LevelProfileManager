@@ -88,3 +88,15 @@ Nếu muốn reset sạch dữ liệu test:
 docker compose down -v
 docker compose up -d --build
 ```
+
+
+## Hotfix bcrypt/passlib
+
+Bản này đã pin `bcrypt==4.0.1` để tương thích với `passlib==1.7.4` trên Python 3.12, tránh lỗi backend exit khi seed user.
+
+
+## Hotfix v0.4.2
+
+- Sửa email seed user từ `example.local` sang `example.com` để tương thích Pydantic EmailStr.
+- Bổ sung Alembic migration `0003_fix_seed_user_emails`.
+
