@@ -1,20 +1,23 @@
-# LevelProfileManager v2.0
+# LevelProfileManager v2.1
 
-MVP Release 2.0 cho ứng dụng quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin.
+Ứng dụng web quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin.
 
-## Nội dung chính
+## v2.1 - Frontend Business UI Complete
 
-- Kế thừa đầy đủ v1.9: Auth/RBAC, HTTT, hồ sơ cấp độ, checklist, minh chứng, workflow, dashboard, export, notification, audit, template, LDAP/SSO foundation, production/security hardening.
-- Bổ sung **Release 2.0 Readiness API** để kiểm tra trạng thái sẵn sàng UAT/MVP.
-- Bổ sung checklist UAT nghiệp vụ để chuẩn bị nghiệm thu nội bộ.
-- Cập nhật version `APP_VERSION=2.0.0`.
+Bản này kế thừa codebase hiện tại và mở rộng giao diện React/Ant Design theo hướng nghiệp vụ:
 
-## API mới
-
-- `GET /api/v1/release/info`
-- `GET /api/v1/release/data-footprint`
-- `GET /api/v1/release/readiness`
-- `GET /api/v1/release/uat-checklist`
+- Login page nâng cấp, SSO/LDAP hint.
+- Dashboard điều hành tổng hợp.
+- Quản lý hệ thống thông tin CRUD.
+- Quản lý hồ sơ cấp độ CRUD.
+- Trang chi tiết hồ sơ tích hợp checklist, minh chứng, workflow, compliance, export, rà soát định kỳ.
+- Compliance Engine UI: gợi ý cấp độ, GAP, risk, readiness.
+- Document Center: minh chứng, tài liệu xuất, template biểu mẫu.
+- Notification Center: Email/Telegram test và log.
+- Periodic Review UI.
+- Audit Trail UI.
+- Admin UI: users, organizations, identity provider, security events.
+- Release/UAT Readiness UI.
 
 ## Chạy trên Windows Docker Desktop
 
@@ -25,12 +28,22 @@ docker compose up -d --build
 .\scripts\windows-test-api.ps1
 ```
 
-## Git
+Truy cập:
+
+- Frontend: http://localhost:3000
+- Swagger API: http://localhost:8000/docs
+
+Tài khoản seed:
+
+- admin / Admin@123
+- attt / Attt@123
+
+## Commit Git
 
 ```powershell
 git add .
-git commit -m "Upgrade to v2.0 - MVP release readiness"
-git tag v2.0
+git commit -m "Upgrade to v2.1 - frontend business UI complete"
+git tag v2.1
 git push
-git push origin v2.0
+git push origin v2.1
 ```

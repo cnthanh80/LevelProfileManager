@@ -1,0 +1,6 @@
+import { Card, Col, Row, Table } from 'antd';
+import { useEffect, useState } from 'react';
+import PageHeader from '../components/PageHeader';
+import JsonView from '../components/JsonView';
+import { api } from '../api/client';
+export default function ReleasePage(){ const [data,setData]=useState({}); useEffect(()=>{Promise.allSettled([api.releaseInfo(),api.releaseReadiness(),api.uatChecklist(),api.dataFootprint()]).then(r=>{const v=(i,d)=>r[i].status==='fulfilled'?r[i].value:d; setData({info:v(0,{}),readiness:v(1,{}),uat:v(2,{}),footprint:v(3,{})});});},[]); const uatItems=Array.isArray(data.uat?.items)?data.uat.items:Array.isArray(data.uat)?data.uat:[]; return <><PageHeader title="Release Readiness" subtitle="Thông tin phiên bản, readiness, UAT checklist và data footprint." /><Row gutter={[16,16]}><Col span={12}><JsonView title="Release Info" data={data.info}/></Col><Col span={12}><JsonView title="Readiness" data={data.readiness}/></Col><Col span={12}><JsonView title="Data Footprint" data={data.footprint}/></Col><Col span={12}><Card title="UAT Checklist"><Table rowKey={(r)=>r.code||r.name||JSON.stringify(r)} dataSource={uatItems} columns={[{title:'Mục',dataIndex:'name'},{title:'Trạng thái',dataIndex:'status'},{title:'Ghi chú',dataIndex:'note'}]} pagination={false}/></Card></Col></Row></>;}
