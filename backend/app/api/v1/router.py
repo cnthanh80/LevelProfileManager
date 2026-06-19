@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import auth, checklists, dashboard, evidence_documents, exported_documents, health, information_systems, level_profiles, organizations, security_requirements, users, workflow
+from app.api.v1.endpoints import audit_logs, auth, checklists, dashboard, evidence_documents, exported_documents, health, information_systems, level_profiles, notifications, organizations, security_requirements, users, workflow
 
 api_router = APIRouter()
 api_router.include_router(health.router, prefix="/health", tags=["health"])
@@ -15,3 +15,6 @@ api_router.include_router(workflow.router, tags=["workflow"])
 api_router.include_router(dashboard.router, tags=["dashboard"])
 
 api_router.include_router(exported_documents.router, tags=["exported-documents"])
+
+api_router.include_router(notifications.router, tags=["notifications"])
+api_router.include_router(audit_logs.router, tags=["audit-logs"])

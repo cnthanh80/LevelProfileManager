@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v0.8..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v0.9..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -99,4 +99,32 @@ Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/summary" | Conver
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/compliance-overview" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/evidence-gaps" | ConvertTo-Json -Depth 8
 
-Write-Host "v0.8 API test completed" -ForegroundColor Green
+Write-Host "v0.8 core API test completed" -ForegroundColor Green
+
+Write-Host "Notification summary" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/notifications/summary" | ConvertTo-Json -Depth 8
+
+Write-Host "Send test notification" -ForegroundColor Cyan
+$notifyBody = @{
+  event_type = "MANUAL_TEST"
+  channel = "IN_APP"
+  recipient = "admin@example.com"
+  subject = "Thong bao test v0.9"
+  message = "Day la thong bao kiem thu Notification Engine v0.9"
+} | ConvertTo-Json
+Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/notifications/send-test" -Body $notifyBody | ConvertTo-Json -Depth 5
+
+if ($profiles.items.Count -gt 0) {
+  $profileId = $profiles.items[0].id
+  Write-Host "Send profile review reminder" -ForegroundColor Cyan
+  $reminderBody = @{
+    channel = "IN_APP"
+    recipient = "attt@example.com"
+  } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profiles/$profileId/notifications/review-reminder" -Body $reminderBody | ConvertTo-Json -Depth 5
+}
+
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/notifications?limit=10" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/audit-logs?limit=10" | ConvertTo-Json -Depth 8
+
+Write-Host "v0.9 API test completed" -ForegroundColor Green
