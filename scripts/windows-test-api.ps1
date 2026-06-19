@@ -323,3 +323,33 @@ if ($profiles.items.Count -gt 0) {
   Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/dossier/summary" | ConvertTo-Json -Depth 8
 }
 Write-Host "v2.3 digital signature and electronic dossier test completed" -ForegroundColor Green
+
+Write-Host "Government Template Center v2.4" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/document-templates/center/summary" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/document-templates/variables" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/government-documents/types" | ConvertTo-Json -Depth 8
+$templateCode = "TPL_TEST_" + (Get-Date -Format "yyyyMMddHHmmss")
+$templateBody = @{
+  code = $templateCode
+  name = "Mau test v2.4"
+  document_type = "PROFILE_EXPLANATION"
+  category = "GOVERNMENT"
+  version = "1.0"
+  agency_name = "NGAN HANG CHINH SACH XA HOI"
+  official_number_prefix = "/NHCS-CNTT"
+  description = "Template tao tu script test v2.4"
+  is_active = $true
+  sort_order = 88
+} | ConvertTo-Json
+$template = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/document-templates" -Body $templateBody
+$template | ConvertTo-Json -Depth 8
+$templateFile = Join-Path $PSScriptRoot "template-test-v2.4.txt"
+Set-Content -Path $templateFile -Value "Template test v2.4: {{ profile.profile_code }} - {{ system.name }}" -Encoding UTF8
+& curl.exe -s -X POST "$BaseUrl/api/v1/document-templates/$($template.id)/upload" -H "Authorization: Bearer $token" -F "file=@$templateFile" | ConvertFrom-Json | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Method Post -Headers $headers "$BaseUrl/api/v1/document-templates/$($template.id)/activate" | ConvertTo-Json -Depth 8
+if ($profiles.items.Count -gt 0) {
+  $profileId = $profiles.items[0].id
+  $previewBody = @{ profile_id = $profileId; template_code = $templateCode; document_type = "PROFILE_EXPLANATION" } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/document-templates/preview-context" -Body $previewBody | ConvertTo-Json -Depth 10
+}
+Write-Host "v2.4 government template center test completed" -ForegroundColor Green

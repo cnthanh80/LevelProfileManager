@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Menu, Typography, Button, Space, Avatar, Tag } from 'antd';
-import { ApartmentOutlined, AuditOutlined, BarChartOutlined, BellOutlined, DatabaseOutlined, FileDoneOutlined, FileProtectOutlined, FileTextOutlined, SignatureOutlined, LogoutOutlined, SafetyCertificateOutlined, SettingOutlined, SolutionOutlined, SyncOutlined } from '@ant-design/icons';
+import { ApartmentOutlined, AuditOutlined, BarChartOutlined, BellOutlined, DatabaseOutlined, FileDoneOutlined, FileProtectOutlined, FileTextOutlined, SignatureOutlined, LogoutOutlined, SafetyCertificateOutlined, SettingOutlined, SolutionOutlined, SyncOutlined, SnippetsOutlined } from '@ant-design/icons';
 import { clearToken } from '../api/client';
 
 const { Header, Sider, Content } = Layout;
@@ -13,6 +13,7 @@ export default function AppLayout({ active, setActive, children, user }) {
     { key: 'profiles', icon: <FileProtectOutlined />, label: 'Hồ sơ cấp độ' },
     { key: 'compliance', icon: <SafetyCertificateOutlined />, label: 'Compliance Engine' },
     { key: 'documents', icon: <FileTextOutlined />, label: 'Tài liệu/Xuất hồ sơ' },
+    { key: 'templates', icon: <SnippetsOutlined />, label: 'Kho biểu mẫu' },
     { key: 'dossier', icon: <SignatureOutlined />, label: 'Hồ sơ điện tử/Ký số' },
     { key: 'reviews', icon: <SyncOutlined />, label: 'Rà soát định kỳ' },
     { key: 'notifications', icon: <BellOutlined />, label: 'Thông báo' },

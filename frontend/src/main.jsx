@@ -10,6 +10,7 @@ import SystemsPage from './pages/SystemsPage';
 import ProfilesPage from './pages/ProfilesPage';
 import CompliancePage from './pages/CompliancePage';
 import DocumentsPage from './pages/DocumentsPage';
+import TemplateCenterPage from './pages/TemplateCenterPage';
 import DigitalDossierPage from './pages/DigitalDossierPage';
 import NotificationsPage from './pages/NotificationsPage';
 import ReviewsPage from './pages/ReviewsPage';
@@ -58,6 +59,7 @@ function App() {
   if (active === 'profiles') page = <ProfilesPage items={data.profiles} systems={data.systems} reload={load} />;
   if (active === 'compliance') page = <CompliancePage profiles={data.profiles} />;
   if (active === 'documents') page = <DocumentsPage profiles={data.profiles} />;
+  if (active === 'templates') page = <TemplateCenterPage profiles={data.profiles} />;
   if (active === 'dossier') page = <DigitalDossierPage profiles={data.profiles} />;
   if (active === 'reviews') page = <ReviewsPage />;
   if (active === 'notifications') page = <NotificationsPage />;

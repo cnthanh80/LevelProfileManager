@@ -1,58 +1,46 @@
-# LevelProfileManager v2.3.3 Hotfix
+# LevelProfileManager v2.4
 
-Sửa lỗi Alembic revision quá dài gây lỗi PostgreSQL:
+Phase 24 - Government Template Center.
 
-`value too long for type character varying(32)`
+## Điểm mới
 
-File migration cũ:
+- Kho biểu mẫu cơ quan/tổ chức.
+- Quản lý template theo loại văn bản: thuyết minh hồ sơ, công văn xin ý kiến, tờ trình, quyết định phê duyệt, phụ lục checklist.
+- Upload/download file template DOCX/PDF/XLSX/TXT/HTML.
+- Đặt template mặc định theo loại văn bản.
+- Danh sách biến template hỗ trợ.
+- Preview context dữ liệu trước khi sinh văn bản.
+- Giao diện web menu **Kho biểu mẫu**.
 
-`backend/alembic/versions/0014_multi_organization_management.py`
-
-được thay bằng:
-
-`backend/alembic/versions/0014_multi_org.py`
-
-Revision ID mới: `0014_multi_org`
-
-
-## LevelProfileManager v2.3 - Digital Signature & Electronic Dossier
-
-Bổ sung Phase 23:
-
-- Quản lý phiên bản hồ sơ điện tử `profile_versions`.
-- Ký số mô phỏng `profile_signatures`.
-- Sinh snapshot JSON và SHA-256 hash cho hồ sơ, checklist, tài liệu minh chứng.
-- So sánh hai phiên bản hồ sơ.
-- Tải bằng chứng ký số mô phỏng.
-- Giao diện React: menu **Hồ sơ điện tử/Ký số**.
-
-### API chính
-
-```text
-GET  /api/v1/profiles/{profile_id}/dossier/summary
-POST /api/v1/profiles/{profile_id}/versions
-GET  /api/v1/profiles/{profile_id}/versions
-GET  /api/v1/profile-versions/{version_id}
-GET  /api/v1/profile-versions/compare
-POST /api/v1/profile-versions/{version_id}/sign
-GET  /api/v1/profiles/{profile_id}/signatures
-GET  /api/v1/profile-signatures/{signature_id}/download
-```
-
-### Chạy kiểm tra
+## Triển khai trên Windows Docker Desktop
 
 ```powershell
+cd D:\Projects\LevelProfileManager
 docker compose down
 docker compose up -d --build
 .\scripts\windows-test-api.ps1
 ```
 
-Frontend: http://localhost:3000
+Truy cập:
 
-User test: `admin / Admin@123`
+- Web: http://localhost:3000
+- API: http://localhost:8000/docs
+
+Tài khoản test:
+
+- `admin / Admin@123`
+
+## Git
+
+```powershell
+git add .
+git commit -m "Upgrade to v2.4 - government template center"
+git tag v2.4
+git push
+git push origin v2.4
+```
 
 
-## Hotfix v2.3.2
+## Hotfix v2.4.1
 
-- Sửa thứ tự route `/profile-versions/compare` để không bị FastAPI nhận nhầm `compare` là `{version_id}`.
-- Giữ nguyên các sửa lỗi v2.3.1: import React và evidence document version.
+- Sửa lỗi preview template context: `LevelProfile` không có thuộc tính `name`; dùng `profile_code` thay thế.
