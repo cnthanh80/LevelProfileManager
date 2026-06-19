@@ -1,28 +1,23 @@
-# LevelProfileManager v1.2
+# LevelProfileManager v1.3
 
-Phase 12 - Periodic Review Engine.
+Phase 13 - Enterprise Dashboard.
 
-## Tính năng mới
+## Bổ sung chính
 
-- Quản lý lịch rà soát định kỳ hồ sơ đề xuất cấp độ.
-- Tạo lịch rà soát thủ công theo từng hồ sơ.
-- Tự động sinh lịch rà soát tiếp theo theo chu kỳ tháng.
-- Theo dõi trạng thái: PLANNED, IN_PROGRESS, COMPLETED, CANCELLED.
-- Danh sách hồ sơ đến hạn/sắp đến hạn rà soát.
-- Hoàn thành rà soát kèm kết luận và phương án xử lý.
-- Tạo thông báo nhắc rà soát định kỳ.
-- Dashboard tổng hợp rà soát định kỳ.
+- Dashboard lãnh đạo cấp enterprise.
+- Ma trận HTTT/hồ sơ theo cấp độ 1-5.
+- Bảng ưu tiên xử lý theo rủi ro, điểm tuân thủ, gap bắt buộc.
+- Action board cho cán bộ ATTT: tiêu chí bắt buộc chưa đáp ứng, hồ sơ thiếu minh chứng, lịch rà soát đến hạn.
+- API executive report tổng hợp phục vụ báo cáo nhanh.
+- Frontend dashboard cập nhật thêm chỉ số điều hành.
 
-## API chính
+## API mới
 
-- POST `/api/v1/profiles/{profile_id}/periodic-reviews`
-- POST `/api/v1/profiles/{profile_id}/periodic-reviews/generate-next`
-- GET `/api/v1/profiles/{profile_id}/periodic-reviews`
-- GET `/api/v1/periodic-reviews/due-soon?days=30`
-- PUT `/api/v1/periodic-reviews/{review_id}`
-- POST `/api/v1/periodic-reviews/{review_id}/complete`
-- POST `/api/v1/periodic-reviews/send-reminders?days=30&recipient=attt@example.com`
-- GET `/api/v1/dashboard/periodic-reviews`
+- `GET /api/v1/dashboard/enterprise/overview`
+- `GET /api/v1/dashboard/enterprise/level-matrix`
+- `GET /api/v1/dashboard/enterprise/compliance-risk`
+- `GET /api/v1/dashboard/enterprise/action-board`
+- `GET /api/v1/dashboard/enterprise/executive-report`
 
 ## Chạy trên Windows Docker Desktop
 
@@ -33,17 +28,12 @@ docker compose up -d --build
 .\scripts\windows-test-api.ps1
 ```
 
-## Tài khoản test
-
-- `admin / Admin@123`
-- `attt / Attt@123`
-
 ## Git
 
 ```powershell
 git add .
-git commit -m "Upgrade to v1.2 - periodic review engine"
-git tag v1.2
+git commit -m "Upgrade to v1.3 - enterprise dashboard"
+git tag v1.3
 git push
-git push origin v1.2
+git push origin v1.3
 ```

@@ -22,11 +22,19 @@ function App() {
       if (!getToken()) { setUser(null); return; }
       const me = await api.me();
       setUser(me);
-      const [summary, workflow, compliance, gaps, systems, profiles, notifications] = await Promise.all([
-        api.dashboardSummary(), api.workflowSummary(), api.complianceOverview(), api.evidenceGaps(), api.systems(), api.profiles(), api.notifications()
+      const [summary, workflow, compliance, gaps, enterprise, executive, systems, profiles, notifications] = await Promise.all([
+        api.dashboardSummary(),
+        api.workflowSummary(),
+        api.complianceOverview(),
+        api.evidenceGaps(),
+        api.enterpriseOverview(),
+        api.enterpriseReport(),
+        api.systems(),
+        api.profiles(),
+        api.notifications()
       ]);
       setData({
-        summary, workflow, compliance, gaps,
+        summary, workflow, compliance, gaps, enterprise, executive,
         systems: systems.items || [], profiles: profiles.items || [], notifications: notifications.items || notifications || []
       });
     } catch (e) {

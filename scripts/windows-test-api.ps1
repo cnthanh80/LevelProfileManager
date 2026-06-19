@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v1.2..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v1.3..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -154,7 +154,14 @@ Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/audit-logs?limit=10" | Conv
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/periodic-reviews" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/periodic-reviews/send-reminders?days=30&recipient=attt@example.com" | ConvertTo-Json -Depth 8
 
-Write-Host "v1.2 API test completed" -ForegroundColor Green
+Write-Host "Enterprise Dashboard" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/enterprise/overview" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/enterprise/level-matrix" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/enterprise/compliance-risk" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/enterprise/action-board" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/enterprise/executive-report" | ConvertTo-Json -Depth 10
+
+Write-Host "v1.3 API test completed" -ForegroundColor Green
 
 Write-Host "Frontend health" -ForegroundColor Cyan
 try {
