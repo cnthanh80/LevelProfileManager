@@ -269,3 +269,10 @@ Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json"
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/security/summary" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/security/events?limit=10" | ConvertTo-Json -Depth 8
 Write-Host "v1.9 security hardening test completed" -ForegroundColor Green
+
+Write-Host "Release 2.0 readiness" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/release/info" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/release/data-footprint" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/release/readiness" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/release/uat-checklist" | ConvertTo-Json -Depth 8
+Write-Host "v2.0 release readiness test completed" -ForegroundColor Green

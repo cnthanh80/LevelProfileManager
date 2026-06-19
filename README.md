@@ -1,16 +1,20 @@
-# LevelProfileManager v1.9
+# LevelProfileManager v2.0
 
-Phase 19 – Security Hardening Foundation.
+MVP Release 2.0 cho ứng dụng quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin.
 
-## Nội dung mới
+## Nội dung chính
 
-- Chính sách mật khẩu tập trung.
-- Kiểm tra độ mạnh mật khẩu.
-- Ghi nhận sự kiện bảo mật: đăng nhập thành công/thất bại, khóa/mở khóa tài khoản.
-- Khóa tài khoản tạm thời sau nhiều lần đăng nhập sai.
-- API tổng hợp security summary.
-- API danh sách security events.
-- API mở khóa tài khoản cho ADMIN.
+- Kế thừa đầy đủ v1.9: Auth/RBAC, HTTT, hồ sơ cấp độ, checklist, minh chứng, workflow, dashboard, export, notification, audit, template, LDAP/SSO foundation, production/security hardening.
+- Bổ sung **Release 2.0 Readiness API** để kiểm tra trạng thái sẵn sàng UAT/MVP.
+- Bổ sung checklist UAT nghiệp vụ để chuẩn bị nghiệm thu nội bộ.
+- Cập nhật version `APP_VERSION=2.0.0`.
+
+## API mới
+
+- `GET /api/v1/release/info`
+- `GET /api/v1/release/data-footprint`
+- `GET /api/v1/release/readiness`
+- `GET /api/v1/release/uat-checklist`
 
 ## Chạy trên Windows Docker Desktop
 
@@ -21,23 +25,12 @@ docker compose up -d --build
 .\scripts\windows-test-api.ps1
 ```
 
-## API chính
-
-```text
-GET  /api/v1/security/password-policy
-POST /api/v1/security/password-policy/validate
-GET  /api/v1/security/summary
-GET  /api/v1/security/events
-POST /api/v1/security/events
-POST /api/v1/users/{user_id}/security/unlock
-```
-
 ## Git
 
 ```powershell
 git add .
-git commit -m "Upgrade to v1.9 - security hardening foundation"
-git tag v1.9
+git commit -m "Upgrade to v2.0 - MVP release readiness"
+git tag v2.0
 git push
-git push origin v1.9
+git push origin v2.0
 ```
