@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v0.9..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v1.0..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -127,4 +127,12 @@ if ($profiles.items.Count -gt 0) {
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/notifications?limit=10" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/audit-logs?limit=10" | ConvertTo-Json -Depth 8
 
-Write-Host "v0.9 API test completed" -ForegroundColor Green
+Write-Host "v1.0 API test completed" -ForegroundColor Green
+
+Write-Host "Frontend health" -ForegroundColor Cyan
+try {
+  Invoke-RestMethod "http://localhost:3000/health" | Out-Host
+  Write-Host "Frontend is available at http://localhost:3000" -ForegroundColor Green
+} catch {
+  Write-Host "Frontend health check skipped or not ready. Open http://localhost:3000 after build completes." -ForegroundColor Yellow
+}

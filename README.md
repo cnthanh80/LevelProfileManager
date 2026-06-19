@@ -1,34 +1,18 @@
-# LevelProfileManager v0.9
+# LevelProfileManager v1.0 - Frontend React Foundation
 
-Phase 9 bổ sung **Notification & Audit Foundation** cho hệ thống quản lý hồ sơ đề xuất cấp độ.
+Ứng dụng web quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin.
 
-## Thành phần kế thừa
+## Thành phần
 
-- v0.3 Auth JWT + RBAC
-- v0.4 Checklist Engine
-- v0.5 Evidence Document Management
-- v0.6 Workflow Engine
-- v0.7 Dashboard Management
-- v0.8 Export Document Engine
+- Backend: Python FastAPI
+- Database: PostgreSQL 16
+- Frontend: React + Vite + Ant Design
+- Container: Docker Compose
 
-## Tính năng mới v0.9
+## Tài khoản test
 
-- Bảng `notification_logs`
-- Bảng `audit_logs`
-- API danh sách/thống kê thông báo
-- API tạo thông báo kiểm thử
-- API gửi nhắc xử lý hồ sơ
-- Nền tảng tích hợp Email/Telegram ở phase sau
-
-## API mới
-
-```text
-GET  /api/v1/notifications
-GET  /api/v1/notifications/summary
-POST /api/v1/notifications/send-test
-POST /api/v1/profiles/{profile_id}/notifications/review-reminder
-GET  /api/v1/audit-logs
-```
+- `admin / Admin@123`
+- `attt / Attt@123`
 
 ## Chạy trên Windows Docker Desktop
 
@@ -36,15 +20,41 @@ GET  /api/v1/audit-logs
 cd D:\Projects\LevelProfileManager
 docker compose down
 docker compose up -d --build
+```
+
+Lần build frontend đầu tiên có thể mất vài phút vì Docker cần tải package NodeJS.
+
+## Truy cập
+
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+- Swagger: http://localhost:8000/docs
+
+## Test API
+
+```powershell
 .\scripts\windows-test-api.ps1
 ```
 
-## Git
+## Nội dung v1.0
+
+Kế thừa v0.9 và bổ sung:
+
+- React frontend foundation
+- Màn hình đăng nhập
+- Layout quản trị
+- Dashboard tổng hợp
+- Danh sách hệ thống thông tin
+- Danh sách hồ sơ cấp độ
+- Danh sách thông báo
+- Docker Compose chạy đủ PostgreSQL + Backend + Frontend
+
+## Commit Git
 
 ```powershell
 git add .
-git commit -m "Upgrade to v0.9 - notification audit foundation"
-git tag v0.9
+git commit -m "Upgrade to v1.0 - frontend React foundation"
+git tag v1.0
 git push
-git push origin v0.9
+git push origin v1.0
 ```
