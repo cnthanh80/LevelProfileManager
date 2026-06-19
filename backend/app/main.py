@@ -3,12 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.middleware.audit_middleware import AuditMiddleware
 
 app = FastAPI(
     title=settings.APP_NAME,
-    version="1.0.0",
+    version="1.5.0",
     description="Ứng dụng quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin",
 )
+
+app.add_middleware(AuditMiddleware)
 
 app.add_middleware(
     CORSMiddleware,

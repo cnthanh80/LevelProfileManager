@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v1.4..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v1.5..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -192,3 +192,17 @@ try {
 } catch {
   Write-Host "Frontend health check skipped or not ready. Open http://localhost:3000 after build completes." -ForegroundColor Yellow
 }
+
+Write-Host "Audit Trail Enhancement" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/audit-logs/summary" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/audit-logs/actions" | ConvertTo-Json -Depth 8
+$manualAuditBody = @{
+  action = "MANUAL_TEST"
+  entity_type = "LEVEL_PROFILE"
+  entity_id = 1
+  detail = "Ban ghi audit tao tu script test v1.5"
+  source = "SCRIPT"
+} | ConvertTo-Json
+Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/audit-logs/manual" -Body $manualAuditBody | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/1/audit-trail" | ConvertTo-Json -Depth 8
+Write-Host "v1.5 audit trail test completed" -ForegroundColor Green
