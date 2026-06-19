@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v1.0..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v1.1..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -92,12 +92,22 @@ if ($profiles.items.Count -gt 0) {
   $pdfExport | ConvertTo-Json -Depth 5
 
   Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/exported-documents?profile_id=$profileId" | ConvertTo-Json -Depth 5
+
+  Write-Host "Compliance Engine" -ForegroundColor Cyan
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/compliance/suggest-level" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/compliance/gap-analysis" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/compliance/score" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/compliance/risk" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/compliance/readiness" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/profiles/$profileId/compliance/run-assessment" | ConvertTo-Json -Depth 8
 }
+
 
 Write-Host "Dashboard summary" -ForegroundColor Cyan
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/summary" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/compliance-overview" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/evidence-gaps" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/compliance" | ConvertTo-Json -Depth 8
 
 Write-Host "v0.8 core API test completed" -ForegroundColor Green
 
@@ -127,7 +137,7 @@ if ($profiles.items.Count -gt 0) {
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/notifications?limit=10" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/audit-logs?limit=10" | ConvertTo-Json -Depth 8
 
-Write-Host "v1.0 API test completed" -ForegroundColor Green
+Write-Host "v1.1 API test completed" -ForegroundColor Green
 
 Write-Host "Frontend health" -ForegroundColor Cyan
 try {

@@ -11,3 +11,6 @@ from app.models.evidence_document import EvidenceDocument  # noqa
 from app.models.approval_comment import ApprovalComment  # noqa
 from app.models.notification_log import NotificationLog  # noqa
 from app.models.audit_log import AuditLog  # noqa
+from app.models.profile_assessment import ProfileAssessment  # noqa
+from app.models.compliance_score import ComplianceScore  # noqa
+from app.models.risk_assessment import RiskAssessment  # noqa
