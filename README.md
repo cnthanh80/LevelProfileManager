@@ -1,30 +1,39 @@
-# LevelProfileManager v0.4
+# LevelProfileManager v0.5
 
-Ứng dụng web quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin.
+Phiên bản v0.5 kế thừa v0.4.2 và bổ sung **Evidence Document Management**.
 
-## v0.4 bổ sung
+## Chức năng mới
 
-- Checklist Engine.
-- Danh mục yêu cầu ATTT theo cấp độ 1-5.
-- Bảng `security_requirements`.
-- Bảng `profile_requirement_answers`.
-- API sinh checklist tự động theo cấp độ hồ sơ.
-- API cập nhật trạng thái đáp ứng checklist.
-- API thống kê tỷ lệ đáp ứng và cảnh báo tiêu chí bắt buộc chưa đáp ứng.
-- Seed dữ liệu mẫu cho 3 hệ thống cấp độ 2, 3, 4.
+- Bảng `evidence_documents`.
+- Upload tài liệu minh chứng: Word, Excel, PDF, ảnh.
+- Phân loại tài liệu: quy chế ATTT, sơ đồ mạng, sơ đồ ứng dụng, phương án sao lưu, phương án giám sát, phương án ứng cứu sự cố, biên bản đánh giá, văn bản thẩm định, quyết định phê duyệt.
+- Gắn tài liệu với hồ sơ đề xuất cấp độ.
+- Gắn tài liệu với từng tiêu chí checklist.
+- Tự cập nhật `evidence_count` cho checklist answer.
+- Download tài liệu minh chứng.
+- Xóa metadata và file vật lý.
+- Lưu file tại `backend/storage/uploads` và mount vào container `/app/storage`.
 
-## Chạy trên Windows Docker Desktop
+## Chạy ứng dụng
 
 ```powershell
 cd D:\Projects\LevelProfileManager
+
 docker compose down
 docker compose up -d --build
 ```
 
-Mở Swagger:
+## Test API
+
+```powershell
+.\scripts\windows-test-api.ps1
+```
+
+## URL
 
 ```text
 http://localhost:8000/docs
+http://localhost:8000/api/v1/health
 ```
 
 ## Tài khoản test
@@ -34,69 +43,25 @@ admin / Admin@123
 attt / Attt@123
 ```
 
-## Test nhanh
-
-```powershell
-.\scripts\windows-test-api.ps1
-```
-
-## API mới trong v0.4
+## API mới
 
 ```http
-GET  /api/v1/security-requirements
-GET  /api/v1/security-requirements/by-level/{level}
-POST /api/v1/security-requirements
-PUT  /api/v1/security-requirements/{requirement_id}
-DELETE /api/v1/security-requirements/{requirement_id}
-
-POST /api/v1/profiles/{profile_id}/generate-checklist
-GET  /api/v1/profiles/{profile_id}/checklist
-PUT  /api/v1/checklist-answers/{answer_id}
-GET  /api/v1/profiles/{profile_id}/compliance-summary
+POST /api/v1/evidence-documents
+GET  /api/v1/evidence-documents
+GET  /api/v1/evidence-documents/{document_id}
+PUT  /api/v1/evidence-documents/{document_id}
+GET  /api/v1/evidence-documents/{document_id}/download
+DELETE /api/v1/evidence-documents/{document_id}
+GET  /api/v1/profiles/{profile_id}/evidence-documents
+GET  /api/v1/checklist-answers/{answer_id}/evidence-documents
 ```
 
-## Quy trình upgrade từ v0.3 lên v0.4 bằng Git
-
-Trước khi giải nén đè:
-
-```powershell
-git status
-git add .
-git commit -m "Backup before upgrade to v0.4"
-git push
-```
-
-Giải nén nội dung `LevelProfileManager-v0.4.zip` đè vào thư mục project hiện tại.
-
-Sau khi test OK:
+## Git sau khi test OK
 
 ```powershell
 git add .
-git commit -m "Upgrade to v0.4 - checklist engine"
-git tag v0.4
+git commit -m "Upgrade to v0.5 - evidence document management"
+git tag v0.5
 git push
-git push origin v0.4
+git push origin v0.5
 ```
-
-## Lưu ý database
-
-Nếu anh đang dùng volume PostgreSQL từ v0.3, Alembic sẽ tự chạy migration `0002_checklist_engine` khi backend khởi động.
-
-Nếu muốn reset sạch dữ liệu test:
-
-```powershell
-docker compose down -v
-docker compose up -d --build
-```
-
-
-## Hotfix bcrypt/passlib
-
-Bản này đã pin `bcrypt==4.0.1` để tương thích với `passlib==1.7.4` trên Python 3.12, tránh lỗi backend exit khi seed user.
-
-
-## Hotfix v0.4.2
-
-- Sửa email seed user từ `example.local` sang `example.com` để tương thích Pydantic EmailStr.
-- Bổ sung Alembic migration `0003_fix_seed_user_emails`.
-
