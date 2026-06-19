@@ -25,6 +25,9 @@ class UserRead(BaseModel):
     role_id: int | None = None
     organization_id: int | None = None
     is_active: bool
+    auth_provider: str = "LOCAL"
+    external_id: str | None = None
+    is_local_auth_allowed: bool = True
 
 
 class UserCreate(BaseModel):
@@ -35,8 +38,32 @@ class UserCreate(BaseModel):
     role_id: int | None = None
     organization_id: int | None = None
     is_active: bool = True
+    auth_provider: str = "LOCAL"
+    external_id: str | None = None
+    is_local_auth_allowed: bool = True
 
 
 class ChangePasswordRequest(BaseModel):
     old_password: str
     new_password: str
+
+
+class LdapLoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class IdentityProviderStatus(BaseModel):
+    local_login_enabled: bool
+    ldap_enabled: bool
+    ldap_dry_run: bool
+    sso_enabled: bool
+    sso_provider_name: str
+    sso_login_url: str | None = None
+
+
+class SsoLoginHint(BaseModel):
+    enabled: bool
+    provider_name: str
+    login_url: str | None = None
+    message: str

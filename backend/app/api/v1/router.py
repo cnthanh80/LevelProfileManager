@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import audit_logs, auth, checklists, compliance, dashboard, document_templates, enterprise_dashboard, evidence_documents, exported_documents, health, information_systems, level_profiles, notifications, organizations, security_requirements, users, workflow, periodic_reviews
+from app.api.v1.endpoints import access_control, audit_logs, auth, checklists, compliance, dashboard, document_templates, enterprise_dashboard, evidence_documents, exported_documents, health, information_systems, level_profiles, notifications, organizations, security_requirements, users, workflow, periodic_reviews
 
 api_router = APIRouter()
 api_router.include_router(health.router, prefix="/health", tags=["health"])
@@ -25,3 +25,5 @@ api_router.include_router(compliance.router, tags=["compliance-engine"])
 api_router.include_router(periodic_reviews.router, tags=["periodic-reviews"])
 
 api_router.include_router(document_templates.router, tags=["document-templates", "government-documents"])
+
+api_router.include_router(access_control.router, tags=["access-control", "ldap-sso-foundation"])

@@ -1,4 +1,4 @@
-# LevelProfileManager v1.6
+# LevelProfileManager v1.7
 
 Phase 16 – Template Engine & Government Document Generator.
 
@@ -52,8 +52,32 @@ POST /api/v1/profiles/{profile_id}/government-documents/generate
 
 ```powershell
 git add .
-git commit -m "Upgrade to v1.6 - template engine government document generator"
-git tag v1.6
+git commit -m "Upgrade to v1.7 - template engine government document generator"
+git tag v1.7
 git push
-git push origin v1.6
+git push origin v1.7
+```
+
+
+## v1.7 - LDAP/SSO Foundation & Organization Access Control
+
+Bổ sung nền tảng tích hợp định danh nội bộ:
+
+- Cấu hình LDAP/SSO trong backend settings.
+- API kiểm tra trạng thái identity provider.
+- API LDAP dry-run login để test quy trình trước khi nối AD/LDAP thật.
+- Mở rộng bảng `users` với `auth_provider`, `external_id`, `is_local_auth_allowed`.
+- Nền tảng phân quyền theo đơn vị/tổ chức.
+- API kiểm tra phạm vi truy cập hồ sơ và hệ thống thông tin.
+
+Endpoint mới:
+
+```text
+GET  /api/v1/auth/identity-provider/status
+GET  /api/v1/auth/sso/login-hint
+POST /api/v1/auth/ldap-login
+GET  /api/v1/access-control/my-scope
+GET  /api/v1/access-control/policy
+GET  /api/v1/information-systems/{id}/access-check
+GET  /api/v1/profiles/{id}/access-check
 ```

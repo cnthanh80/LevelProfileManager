@@ -31,6 +31,23 @@ class Settings(BaseSettings):
     TELEGRAM_DEFAULT_CHAT_ID: str | None = None
     TELEGRAM_TIMEOUT_SECONDS: int = 15
 
+    # Phase 17 - LDAP/SSO foundation. Safe by default for local development.
+    LDAP_ENABLED: bool = False
+    LDAP_DRY_RUN: bool = True
+    LDAP_SERVER_URI: str | None = None
+    LDAP_BIND_DN: str | None = None
+    LDAP_BIND_PASSWORD: str | None = None
+    LDAP_USER_BASE_DN: str | None = None
+    LDAP_USER_FILTER: str = "(sAMAccountName={username})"
+
+    SSO_ENABLED: bool = False
+    SSO_PROVIDER_NAME: str = "Internal SSO"
+    SSO_LOGIN_URL: str | None = None
+    SSO_LOGOUT_URL: str | None = None
+    SSO_ENTITY_ID: str | None = None
+
+    ACCESS_CONTROL_STRICT_ORG_SCOPE: bool = True
+
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
 

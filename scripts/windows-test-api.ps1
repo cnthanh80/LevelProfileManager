@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v1.6..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v1.7..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -239,3 +239,16 @@ if ($profiles.items.Count -gt 0) {
 }
 
 Write-Host "v1.6 template engine test completed" -ForegroundColor Green
+
+Write-Host "LDAP/SSO Foundation & Organization Access Control" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/auth/identity-provider/status" | ConvertTo-Json -Depth 8
+Invoke-RestMethod "$BaseUrl/api/v1/auth/sso/login-hint" | ConvertTo-Json -Depth 8
+$ldapBody = @{ username = "admin"; password = "Admin@123" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/auth/ldap-login" -Body $ldapBody | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/access-control/my-scope" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/access-control/policy" | ConvertTo-Json -Depth 8
+if ($profiles.items.Count -gt 0) {
+  $profileId = $profiles.items[0].id
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/access-check" | ConvertTo-Json -Depth 8
+}
+Write-Host "v1.7 LDAP/SSO foundation test completed" -ForegroundColor Green

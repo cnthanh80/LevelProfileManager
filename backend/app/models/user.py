@@ -14,3 +14,6 @@ class User(Base, TimestampMixin):
     role_id: Mapped[int | None] = mapped_column(ForeignKey("roles.id"))
     organization_id: Mapped[int | None] = mapped_column(ForeignKey("organizations.id"))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    auth_provider: Mapped[str] = mapped_column(String(50), default="LOCAL", nullable=False)
+    external_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
+    is_local_auth_allowed: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
