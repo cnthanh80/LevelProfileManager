@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Menu, Typography, Button, Space, Avatar, Tag } from 'antd';
-import { ApartmentOutlined, AuditOutlined, BarChartOutlined, BellOutlined, CrownOutlined, DatabaseOutlined, FileDoneOutlined, FileProtectOutlined, FileTextOutlined, RobotOutlined, SignatureOutlined, LogoutOutlined, SafetyCertificateOutlined, SettingOutlined, SolutionOutlined, SyncOutlined, SnippetsOutlined, WarningOutlined, SendOutlined, BranchesOutlined, CloudServerOutlined } from '@ant-design/icons';
+import { ApartmentOutlined, AuditOutlined, BarChartOutlined, BellOutlined, CrownOutlined, DatabaseOutlined, FileDoneOutlined, FileProtectOutlined, FileTextOutlined, RobotOutlined, SignatureOutlined, LogoutOutlined, SafetyCertificateOutlined, SettingOutlined, SolutionOutlined, SyncOutlined, SnippetsOutlined, WarningOutlined, SendOutlined, BranchesOutlined, CloudServerOutlined, KeyOutlined } from '@ant-design/icons';
 import { clearToken } from '../api/client';
 
 const { Header, Sider, Content } = Layout;
@@ -25,6 +25,7 @@ export default function AppLayout({ active, setActive, children, user }) {
     { key: 'reviews', icon: <SyncOutlined />, label: 'Rà soát định kỳ' },
     { key: 'notifications', icon: <BellOutlined />, label: 'Thông báo' },
     { key: 'audit', icon: <AuditOutlined />, label: 'Audit Trail' },
+    { key: 'identity-provider', icon: <KeyOutlined />, label: 'LDAP/SSO Production' },
     { key: 'admin', icon: <SettingOutlined />, label: 'Quản trị' },
     { key: 'release', icon: <FileDoneOutlined />, label: 'Release/UAT' },
   ];
@@ -47,7 +48,7 @@ export default function AppLayout({ active, setActive, children, user }) {
         <Header style={{ background: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', boxShadow: '0 1px 6px rgba(0,0,0,.08)' }}>
           <div>
             <Typography.Title level={4} style={{ margin: 0 }}>Quản lý hồ sơ đề xuất cấp độ ATHTTT</Typography.Title>
-            <Typography.Text type="secondary">Production 3.4 · ATHTTT theo cấp độ</Typography.Text>
+            <Typography.Text type="secondary">Production 3.5 · ATHTTT theo cấp độ</Typography.Text>
           </div>
           <Space>
             <Tag color="blue">{user?.role?.name || user?.role_name || 'USER'}</Tag>

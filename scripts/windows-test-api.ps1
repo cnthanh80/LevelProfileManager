@@ -576,3 +576,34 @@ Write-Host "LevelProfileManager API v3.4 PASSED" -ForegroundColor Green
 Write-Host "CMDB & Asset Inventory Integration: OK" -ForegroundColor Green
 Write-Host "ALL TESTS PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green
+
+Write-Host "LDAP/SSO Production v3.5" -ForegroundColor Cyan
+try {
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/identity-provider/production-readiness" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/identity-provider/ldap/test-connection" -Body "{}" | ConvertTo-Json -Depth 8
+  $ldapPreviewBody = @{
+    username = "ldap.test"
+    email = "ldap.test@example.com"
+    full_name = "LDAP Test User"
+    role_code = "ATTT_OFFICER"
+  } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/identity-provider/ldap/preview-user" -Body $ldapPreviewBody | ConvertTo-Json -Depth 8
+  $ssoBody = @{
+    provider_name = "Enterprise SSO"
+    username = "sso.test"
+    email = "sso.test@example.com"
+    full_name = "SSO Test User"
+    role_code = "REVIEWER"
+  } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/identity-provider/sso/assertion-dry-run" -Body $ssoBody | ConvertTo-Json -Depth 8
+  Write-Host "LDAP/SSO Production v3.5 OK" -ForegroundColor Green
+} catch {
+  Write-Host "LDAP/SSO Production v3.5 test warning: $($_.Exception.Message)" -ForegroundColor Yellow
+  throw
+}
+
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v3.5 PASSED" -ForegroundColor Green
+Write-Host "LDAP/SSO Production: OK" -ForegroundColor Green
+Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green

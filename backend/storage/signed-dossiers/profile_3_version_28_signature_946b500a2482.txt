@@ -1,0 +1,8 @@
+HỒ SƠ ĐIỆN TỬ ĐÃ KÝ SỐ MÔ PHỎNG
+Profile ID: 3
+Version: 28
+Snapshot Hash: 123820c40767c1d635f1884ce4863250b360a2b3f1728b9f094fc51054df059b
+Signer: Quản trị hệ thống
+Role: Lanh dao phe duyet
+Signature Hash: 946b500a2482a7a656954e34058a11dd0022f38b0d9e387a967b30e18ad7c656
+Comment: Ky so mo phong tu script v2.3

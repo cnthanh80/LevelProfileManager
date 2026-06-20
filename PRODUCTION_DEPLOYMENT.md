@@ -1,4 +1,4 @@
-# LevelProfileManager v3.4 - CMDB & Asset Inventory Integration
+# LevelProfileManager v3.5 - CMDB & Asset Inventory Integration
 
 
 ## 1. Mục tiêu
@@ -78,6 +78,6 @@ attt / Attt@123
 - Bổ sung giao diện Workflow thẩm định.
 
 
-## v3.4 CMDB Production Notes
+## v3.5 CMDB Production Notes
 
 Khi triển khai thực tế, có thể tích hợp nguồn CMDB/Excel nội bộ, GLPI, iTop, ServiceNow hoặc dữ liệu inventory từ hệ thống giám sát. Nên quy định mã tài sản chuẩn và quy trình cập nhật định kỳ.

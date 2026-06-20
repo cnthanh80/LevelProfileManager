@@ -50,6 +50,12 @@ export const api = {
   me: () => request('/auth/me'),
   roles: () => request('/auth/roles'),
   identityProviderStatus: () => request('/auth/identity-provider/status'),
+
+  identityProductionReadiness: () => request('/identity-provider/production-readiness'),
+  ldapTestConnection: (payload) => request('/identity-provider/ldap/test-connection', { method: 'POST', body: JSON.stringify(payload || {}) }),
+  ldapPreviewUser: (payload) => request('/identity-provider/ldap/preview-user', { method: 'POST', body: JSON.stringify(payload) }),
+  ldapSyncUser: (payload) => request('/identity-provider/ldap/sync-user', { method: 'POST', body: JSON.stringify(payload) }),
+  ssoAssertionDryRun: (payload) => request('/identity-provider/sso/assertion-dry-run', { method: 'POST', body: JSON.stringify(payload) }),
   ssoLoginHint: () => request('/auth/sso/login-hint'),
   changePassword: (payload) => request('/auth/change-password', { method: 'POST', body: JSON.stringify(payload) }),
 

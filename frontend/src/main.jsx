@@ -24,6 +24,7 @@ import ExecutiveDashboardPage from './pages/ExecutiveDashboardPage';
 import AiClassificationPage from './pages/AiClassificationPage';
 import RealSignaturePage from './pages/RealSignaturePage';
 import CmdbPage from './pages/CmdbPage';
+import IdentityProviderPage from './pages/IdentityProviderPage';
 import { api, clearToken, getToken } from './api/client';
 
 function pickItems(x) { return Array.isArray(x?.items) ? x.items : Array.isArray(x) ? x : []; }
@@ -79,6 +80,7 @@ function App() {
   if (active === 'notifications') page = <NotificationsPage />;
   if (active === 'audit') page = <AuditPage />;
   if (active === 'admin') page = <AdminPage />;
+  if (active === 'identity-provider') page = <IdentityProviderPage />;
   if (active === 'release') page = <ReleasePage />;
 
   return <ConfigProvider theme={{ token: { borderRadius: 8 } }}>
