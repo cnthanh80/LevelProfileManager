@@ -161,4 +161,14 @@ export const api = {
   profileSignatures: (profileId, params) => page(`/profiles/${profileId}/signatures`, params),
   runtime: () => request('/system/runtime'),
   productionChecklist: () => request('/system/production-checklist'),
+
+  riskRegisters: (params) => page('/risk-registers', params),
+  riskRegisterSummary: () => request('/risk-registers/summary'),
+  createRiskRegister: (payload) => request('/risk-registers', { method: 'POST', body: JSON.stringify(payload) }),
+  updateRiskRegister: (id, payload) => request(`/risk-registers/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+  closeRiskRegister: (id) => request(`/risk-registers/${id}/close`, { method: 'POST' }),
+  slaPolicies: (params) => page('/sla/policies', params),
+  createSlaPolicy: (payload) => request('/sla/policies', { method: 'POST', body: JSON.stringify(payload) }),
+  seedSlaPolicies: () => request('/sla/policies/seed-defaults', { method: 'POST' }),
+  slaSummary: () => request('/sla/summary'),
 };

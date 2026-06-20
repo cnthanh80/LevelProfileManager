@@ -12,3 +12,5 @@ from app.models.security_event import SecurityEvent
 
 from app.models.profile_version import ProfileVersion
 from app.models.profile_signature import ProfileSignature
+
+from app.models.risk_register import RiskRegisterItem, SlaPolicy

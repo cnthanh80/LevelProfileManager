@@ -1,18 +1,18 @@
-# LevelProfileManager v2.4
+# LevelProfileManager v2.5
 
-Phase 24 - Government Template Center.
+Phiên bản v2.5 bổ sung **SLA & Risk Register** trên nền v2.4.1.
 
-## Điểm mới
+## Tính năng mới
 
-- Kho biểu mẫu cơ quan/tổ chức.
-- Quản lý template theo loại văn bản: thuyết minh hồ sơ, công văn xin ý kiến, tờ trình, quyết định phê duyệt, phụ lục checklist.
-- Upload/download file template DOCX/PDF/XLSX/TXT/HTML.
-- Đặt template mặc định theo loại văn bản.
-- Danh sách biến template hỗ trợ.
-- Preview context dữ liệu trước khi sinh văn bản.
-- Giao diện web menu **Kho biểu mẫu**.
+- Quản lý danh mục rủi ro theo hồ sơ/hệ thống.
+- Tính điểm rủi ro theo likelihood x impact.
+- Phân loại LOW/MEDIUM/HIGH/CRITICAL.
+- Theo dõi trạng thái xử lý rủi ro.
+- Quản lý chính sách SLA theo trạng thái workflow.
+- Dashboard cảnh báo SLA warning/breached.
+- Giao diện web menu **SLA & Risk Register**.
 
-## Triển khai trên Windows Docker Desktop
+## Chạy kiểm tra
 
 ```powershell
 cd D:\Projects\LevelProfileManager
@@ -21,26 +21,12 @@ docker compose up -d --build
 .\scripts\windows-test-api.ps1
 ```
 
-Truy cập:
-
-- Web: http://localhost:3000
-- API: http://localhost:8000/docs
-
-Tài khoản test:
-
-- `admin / Admin@123`
-
-## Git
+## Commit
 
 ```powershell
 git add .
-git commit -m "Upgrade to v2.4 - government template center"
-git tag v2.4
+git commit -m "Upgrade to v2.5 - SLA and risk register"
+git tag v2.5
 git push
-git push origin v2.4
+git push origin v2.5
 ```
-
-
-## Hotfix v2.4.1
-
-- Sửa lỗi preview template context: `LevelProfile` không có thuộc tính `name`; dùng `profile_code` thay thế.

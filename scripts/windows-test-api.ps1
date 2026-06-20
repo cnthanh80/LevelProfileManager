@@ -353,3 +353,31 @@ if ($profiles.items.Count -gt 0) {
   Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/document-templates/preview-context" -Body $previewBody | ConvertTo-Json -Depth 10
 }
 Write-Host "v2.4 government template center test completed" -ForegroundColor Green
+
+Write-Host "SLA & Risk Register v2.5" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/risk-registers/summary" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/sla/policies/seed-defaults" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/sla/policies?limit=20" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/sla/summary" | ConvertTo-Json -Depth 10
+$riskCode = "RR-TEST-" + (Get-Date -Format "yyyyMMddHHmmss")
+$riskBody = @{
+  risk_code = $riskCode
+  title = "Rui ro test v2.5"
+  description = "Rui ro tao tu script test SLA & Risk Register"
+  category = "COMPLIANCE"
+  likelihood = 4
+  impact = 4
+  owner = "Can bo ATTT"
+  mitigation_plan = "Bo sung bien phap kiem soat va tai lieu minh chung"
+} | ConvertTo-Json
+if ($profiles.items.Count -gt 0) {
+  $riskObj = $riskBody | ConvertFrom-Json
+  $riskObj | Add-Member -NotePropertyName profile_id -NotePropertyValue $profiles.items[0].id
+  $riskBody = $riskObj | ConvertTo-Json
+}
+$risk = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/risk-registers" -Body $riskBody
+$risk | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/risk-registers?limit=20" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/risk-registers/summary" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/risk-registers/$($risk.id)/close" | ConvertTo-Json -Depth 8
+Write-Host "v2.5 SLA and Risk Register test completed" -ForegroundColor Green
