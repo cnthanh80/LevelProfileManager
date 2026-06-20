@@ -1,44 +1,37 @@
-# LevelProfileManager v2.6
+# LevelProfileManager v2.7
 
-Phase 26 – Assessment Portal.
+Phase 27 - Executive Dashboard.
 
-Bản này kế thừa v2.5 và bổ sung cổng thẩm định hồ sơ đề xuất cấp độ.
+## Bổ sung
 
-## Tính năng mới
+- API Dashboard lãnh đạo: `/api/v1/dashboard/executive/*`
+- KPI điều hành: mức tuân thủ, rủi ro cao, gap bắt buộc, quá hạn rà soát, thẩm định tồn đọng
+- Board pack cho lãnh đạo
+- Giao diện menu **Dashboard lãnh đạo**
 
-- Quản lý hồ sơ gửi thẩm định.
-- Theo dõi trạng thái: `DRAFT`, `SUBMITTED`, `COMMENTED`, `COMPLETED`.
-- Tiếp nhận ý kiến thẩm định.
-- Phản hồi ý kiến thẩm định.
-- Dashboard tóm tắt thẩm định.
-- Giao diện web menu **Cổng thẩm định**.
-
-## Chạy trên Windows Docker Desktop
+## Chạy
 
 ```powershell
-cd D:\Projects\LevelProfileManager
 docker compose down
 docker compose up -d --build
 .\scripts\windows-test-api.ps1
 ```
 
-## Truy cập
+Truy cập: http://localhost:3000
 
-- Frontend: http://localhost:3000
-- Backend Swagger: http://localhost:8000/docs
+Tài khoản: `admin / Admin@123`
 
-User mặc định:
 
-```text
-admin / Admin@123
-```
+## v2.7.1 - UTF8 & Quality Hotfix
 
-## Git
+- Chuẩn hóa output UTF-8 cho script `scripts/windows-test-api.ps1` trên Windows PowerShell.
+- Bổ sung thông báo kết thúc `ALL TESTS PASSED` cho phase v2.7.
+- Giữ nguyên API/backend của v2.7, chỉ cải thiện chất lượng kiểm thử và hiển thị tiếng Việt.
+
+Triển khai:
 
 ```powershell
-git add .
-git commit -m "Upgrade to v2.6 - assessment portal"
-git tag v2.6
-git push
-git push origin v2.6
+docker compose down
+docker compose up -d --build
+.\scripts\windows-test-api.ps1
 ```

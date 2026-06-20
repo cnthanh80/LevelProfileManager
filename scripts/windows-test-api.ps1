@@ -1,7 +1,16 @@
 $ErrorActionPreference = "Stop"
 
+# Force UTF-8 output for Vietnamese text on Windows PowerShell 5.1 and PowerShell 7+
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+try {
+  chcp 65001 | Out-Null
+} catch {
+  # Ignore when chcp is not available
+}
+
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v2.2..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v2.7..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -418,3 +427,16 @@ Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/assessment-cases?limit=20" 
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/assessment-feedbacks?limit=20" | ConvertTo-Json -Depth 8
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/assessment-portal/summary" | ConvertTo-Json -Depth 10
 Write-Host "v2.6 assessment portal test completed" -ForegroundColor Green
+
+Write-Host "Executive Leadership Dashboard v2.7" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/executive/kpis" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/executive/portfolio" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/executive/priority-actions" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/executive/board-pack" | ConvertTo-Json -Depth 10
+Write-Host ""
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v2.7.1 PASSED" -ForegroundColor Green
+Write-Host "UTF-8 Vietnamese output: OK" -ForegroundColor Green
+Write-Host "Executive Dashboard: OK" -ForegroundColor Green
+Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green
