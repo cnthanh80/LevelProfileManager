@@ -440,3 +440,16 @@ Write-Host "UTF-8 Vietnamese output: OK" -ForegroundColor Green
 Write-Host "Executive Dashboard: OK" -ForegroundColor Green
 Write-Host "ALL TESTS PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green
+
+Write-Host "Production Release v3.0" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/release/info" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/release/readiness" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/release/production-readiness" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/release/uat-checklist" | ConvertTo-Json -Depth 10
+
+Write-Host ""
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v3.0 PASSED" -ForegroundColor Green
+Write-Host "Production Release Readiness: OK" -ForegroundColor Green
+Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green

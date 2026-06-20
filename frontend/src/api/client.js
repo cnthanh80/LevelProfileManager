@@ -148,6 +148,7 @@ export const api = {
   securityEvents: () => request('/security/events'),
   releaseInfo: () => request('/release/info'),
   releaseReadiness: () => request('/release/readiness'),
+  productionReadiness: () => request('/release/production-readiness'),
   uatChecklist: () => request('/release/uat-checklist'),
   dataFootprint: () => request('/release/data-footprint'),
 

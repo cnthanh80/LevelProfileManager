@@ -1,15 +1,8 @@
-# LevelProfileManager v2.7
+# LevelProfileManager v3.0
 
-Phase 27 - Executive Dashboard.
+Ứng dụng web quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin theo hướng production pilot.
 
-## Bổ sung
-
-- API Dashboard lãnh đạo: `/api/v1/dashboard/executive/*`
-- KPI điều hành: mức tuân thủ, rủi ro cao, gap bắt buộc, quá hạn rà soát, thẩm định tồn đọng
-- Board pack cho lãnh đạo
-- Giao diện menu **Dashboard lãnh đạo**
-
-## Chạy
+## Chạy local bằng Docker Desktop Windows
 
 ```powershell
 docker compose down
@@ -17,21 +10,52 @@ docker compose up -d --build
 .\scripts\windows-test-api.ps1
 ```
 
-Truy cập: http://localhost:3000
+Frontend:
 
-Tài khoản: `admin / Admin@123`
+```text
+http://localhost:3000
+```
 
+Backend Swagger:
 
-## v2.7.1 - UTF8 & Quality Hotfix
+```text
+http://localhost:8000/docs
+```
 
-- Chuẩn hóa output UTF-8 cho script `scripts/windows-test-api.ps1` trên Windows PowerShell.
-- Bổ sung thông báo kết thúc `ALL TESTS PASSED` cho phase v2.7.
-- Giữ nguyên API/backend của v2.7, chỉ cải thiện chất lượng kiểm thử và hiển thị tiếng Việt.
+Tài khoản UAT:
 
-Triển khai:
+```text
+admin / Admin@123
+attt / Attt@123
+```
+
+## Kiểm tra production readiness
 
 ```powershell
-docker compose down
-docker compose up -d --build
-.\scripts\windows-test-api.ps1
+.\scripts\windows-production-check.ps1
 ```
+
+## Tính năng chính
+
+- Quản lý hệ thống thông tin.
+- Quản lý hồ sơ đề xuất cấp độ.
+- Checklist yêu cầu ATTT.
+- Quản lý minh chứng.
+- Workflow phê duyệt.
+- Dashboard nghiệp vụ và dashboard lãnh đạo.
+- Export DOCX/PDF.
+- Notification Email/Telegram foundation.
+- Audit trail nâng cao.
+- Compliance engine.
+- Rà soát định kỳ.
+- LDAP/SSO foundation.
+- Multi-organization.
+- Hồ sơ điện tử và ký số mô phỏng.
+- Kho biểu mẫu cơ quan.
+- SLA & Risk Register.
+- Assessment Portal.
+- Production readiness API.
+
+## Production guide
+
+Xem `PRODUCTION_DEPLOYMENT.md`.
