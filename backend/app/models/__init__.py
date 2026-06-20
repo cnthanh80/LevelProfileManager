@@ -26,3 +26,5 @@ from app.models.siem_integration import SiemConnector, SiemEvent, SiemCorrelatio
 from app.models.compliance_automation import ComplianceAutomationRule, ComplianceAutomationRun, ComplianceAutomationFinding  # noqa
 
 from app.models.compliance_monitoring import ComplianceSnapshot, ComplianceMonitoringFinding, ComplianceMonitoringNotification  # noqa
+
+from app.models.enterprise_reporting import EnterpriseReportSnapshot, DataWarehouseMetric, ReportExportJob  # noqa

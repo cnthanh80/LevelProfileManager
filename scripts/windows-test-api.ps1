@@ -689,3 +689,25 @@ Write-Host "LevelProfileManager API v3.8 PASSED" -ForegroundColor Green
 Write-Host "Continuous Compliance Monitoring: OK" -ForegroundColor Green
 Write-Host "ALL TESTS PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green
+
+
+Write-Host "Enterprise Reporting & Data Warehouse v3.9" -ForegroundColor Cyan
+try {
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/enterprise-reporting" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/enterprise-reporting/summary" | ConvertTo-Json -Depth 10
+  $reportBody = @{ period_type = "MONTHLY"; refresh_metrics = $true } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/enterprise-reporting/snapshots/generate" -Body $reportBody | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/enterprise-reporting/snapshots?limit=10" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/enterprise-reporting/data-warehouse/metrics?limit=20" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/enterprise-reporting/export/portfolio-csv" | Out-Null
+  Write-Host "Enterprise Reporting v3.9 OK" -ForegroundColor Green
+} catch {
+  Write-Host "Enterprise Reporting v3.9 test failed: $($_.Exception.Message)" -ForegroundColor Red
+  throw
+}
+
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v3.9 PASSED" -ForegroundColor Green
+Write-Host "Enterprise Reporting & Data Warehouse: OK" -ForegroundColor Green
+Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green

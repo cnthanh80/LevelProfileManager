@@ -261,4 +261,11 @@ export const api = {
   createAssessmentFeedback: (payload) => request('/assessment-feedbacks', { method: 'POST', body: JSON.stringify(payload) }),
   updateAssessmentFeedback: (id, payload) => request(`/assessment-feedbacks/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
   respondAssessmentFeedback: (id, payload) => request(`/assessment-feedbacks/${id}/respond`, { method: 'POST', body: JSON.stringify(payload) }),
+
+  enterpriseReportingDashboard: () => request('/dashboard/enterprise-reporting'),
+  enterpriseReportingSummary: () => request('/enterprise-reporting/summary'),
+  generateEnterpriseReportSnapshot: (payload) => request('/enterprise-reporting/snapshots/generate', { method: 'POST', body: JSON.stringify(payload || {}) }),
+  enterpriseReportSnapshots: (params) => page('/enterprise-reporting/snapshots', params),
+  enterpriseDataWarehouseMetrics: (params) => page('/enterprise-reporting/data-warehouse/metrics', params),
+  enterprisePortfolioCsvUrl: () => downloadUrl('/enterprise-reporting/export/portfolio-csv'),
 };
