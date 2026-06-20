@@ -1,15 +1,19 @@
-# LevelProfileManager v3.5
+# LevelProfileManager v3.7
 
-Phase 35 – LDAP/SSO Production.
+Ứng dụng web quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin.
 
-## Tính năng mới
+## v3.7 - Compliance Automation
 
-- LDAP/SSO production readiness API.
-- LDAP connection dry-run/test endpoint.
-- Preview mapping LDAP user sang user nội bộ.
-- Sync external LDAP user vào hệ thống.
-- SSO assertion dry-run cho claim mapping.
-- Giao diện **LDAP/SSO Production**.
+Bổ sung:
+
+- Compliance Automation Rule Engine
+- Chạy kiểm tra tự động gap tuân thủ theo hồ sơ
+- Phát hiện tiêu chí bắt buộc chưa đáp ứng
+- Phát hiện tiêu chí đạt nhưng thiếu minh chứng
+- Phát hiện rủi ro cao chưa xử lý
+- Phát hiện hồ sơ quá hạn rà soát
+- Dashboard Compliance Automation
+- Giao diện menu **Compliance Automation**
 
 ## Chạy trên Windows Docker Desktop
 
@@ -23,8 +27,13 @@ docker compose up -d --build
 Truy cập:
 
 - Frontend: http://localhost:3000
-- API Docs: http://localhost:8000/docs
+- Swagger: http://localhost:8000/docs
 
 Tài khoản test:
 
 - admin / Admin@123
+- attt / Attt@123
+
+
+## v3.7.2 Hotfix
+- Added missing ComplianceAutomationRunRequest compatibility schema.

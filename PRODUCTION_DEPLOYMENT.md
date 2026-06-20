@@ -1,4 +1,4 @@
-# LevelProfileManager v3.5 - CMDB & Asset Inventory Integration
+# LevelProfileManager v3.6 - SIEM & Audit Integration
 
 
 ## 1. Mục tiêu
@@ -78,6 +78,16 @@ attt / Attt@123
 - Bổ sung giao diện Workflow thẩm định.
 
 
-## v3.5 CMDB Production Notes
+## v3.6 SIEM/SOC Production Notes
 
 Khi triển khai thực tế, có thể tích hợp nguồn CMDB/Excel nội bộ, GLPI, iTop, ServiceNow hoặc dữ liệu inventory từ hệ thống giám sát. Nên quy định mã tài sản chuẩn và quy trình cập nhật định kỳ.
+
+## v3.6 - SIEM/SOC Integration Notes
+
+Khi triển khai production cần cấu hình:
+
+1. Kênh gửi sự kiện ra SIEM qua HTTPS webhook, syslog hoặc message queue.
+2. TLS/mTLS giữa LevelProfileManager và SIEM Collector.
+3. Token/API key lưu bằng secret manager, không lưu plaintext trong `.env`.
+4. Cho phép mapping sự kiện từ `audit_logs`, `security_events`, ký số, workflow và API errors.
+5. SOC cần định nghĩa rule thực tế cho hồ sơ cấp độ 3 trở lên, hồ sơ quá hạn và thay đổi không đúng quy trình.

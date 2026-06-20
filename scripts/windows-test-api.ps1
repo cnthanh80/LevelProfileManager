@@ -10,7 +10,7 @@ try {
 }
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v2.7..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v3.7..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -605,5 +605,61 @@ try {
 Write-Host "======================================" -ForegroundColor Green
 Write-Host "LevelProfileManager API v3.5 PASSED" -ForegroundColor Green
 Write-Host "LDAP/SSO Production: OK" -ForegroundColor Green
+Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green
+
+Write-Host "SIEM & Audit Integration v3.6" -ForegroundColor Cyan
+try {
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/siem/status" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/siem/connectors/seed-defaults" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/siem/rules/seed-defaults" | ConvertTo-Json -Depth 8
+  $siemEventBody = @{
+    source_system = "LevelProfileManager"
+    event_type = "AUTH_FAILURE"
+    severity = "HIGH"
+    status = "OPEN"
+    username = "admin"
+    ip_address = "127.0.0.1"
+    asset_code = "LPM-APP"
+    raw_message = "v3.6 SIEM integration test event"
+  } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/siem/events/ingest" -Body $siemEventBody | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/siem/events/ingest-audit?limit=10" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/siem/events/ingest-security?limit=10" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/siem/connectors?limit=10" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/siem/events?limit=10" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/siem/rules?limit=10" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/siem/correlation/summary" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/siem" | ConvertTo-Json -Depth 8
+  Write-Host "SIEM & Audit Integration v3.6 OK" -ForegroundColor Green
+} catch {
+  Write-Host "SIEM & Audit Integration v3.6 test failed: $($_.Exception.Message)" -ForegroundColor Red
+  throw
+}
+
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v3.6 PASSED" -ForegroundColor Green
+Write-Host "SIEM & Audit Integration: OK" -ForegroundColor Green
+Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green
+
+Write-Host "Compliance Automation v3.7" -ForegroundColor Cyan
+try {
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/compliance-automation" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/compliance-automation/rules/seed-defaults" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/compliance-automation/rules?limit=20" | ConvertTo-Json -Depth 8
+  $runBody = @{ scope = "ALL_PROFILES" } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/compliance-automation/run" -Body $runBody | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/compliance-automation/runs?limit=10" | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/compliance-automation/findings?limit=10" | ConvertTo-Json -Depth 8
+  Write-Host "Compliance Automation v3.7 OK" -ForegroundColor Green
+} catch {
+  Write-Host "Compliance Automation v3.7 test failed: $($_.Exception.Message)" -ForegroundColor Red
+  throw
+}
+
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v3.7 PASSED" -ForegroundColor Green
+Write-Host "Compliance Automation: OK" -ForegroundColor Green
 Write-Host "ALL TESTS PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green

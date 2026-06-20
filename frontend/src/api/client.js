@@ -225,6 +225,29 @@ export const api = {
   cmdbProfileInventory: (profileId) => request(`/profiles/${profileId}/cmdb-inventory`),
   cmdbSyncProfile: (profileId) => request(`/profiles/${profileId}/cmdb-sync`, { method: 'POST' }),
 
+
+  siemStatus: () => request('/siem/status'),
+  siemDashboard: () => request('/dashboard/siem'),
+  siemCorrelationSummary: () => request('/siem/correlation/summary'),
+  seedSiemConnectors: () => request('/siem/connectors/seed-defaults', { method: 'POST' }),
+  seedSiemRules: () => request('/siem/rules/seed-defaults', { method: 'POST' }),
+  siemConnectors: (params) => page('/siem/connectors', params),
+  createSiemConnector: (payload) => request('/siem/connectors', { method: 'POST', body: JSON.stringify(payload) }),
+  siemEvents: (params) => page('/siem/events', params),
+  ingestSiemEvent: (payload) => request('/siem/events/ingest', { method: 'POST', body: JSON.stringify(payload) }),
+  ingestAuditToSiem: () => request('/siem/events/ingest-audit', { method: 'POST' }),
+  ingestSecurityToSiem: () => request('/siem/events/ingest-security', { method: 'POST' }),
+  siemRules: (params) => page('/siem/rules', params),
+  createSiemRule: (payload) => request('/siem/rules', { method: 'POST', body: JSON.stringify(payload) }),
+
+
+  complianceAutomationDashboard: () => request('/dashboard/compliance-automation'),
+  seedComplianceAutomationRules: () => request('/compliance-automation/rules/seed-defaults', { method: 'POST' }),
+  complianceAutomationRules: (params) => page('/compliance-automation/rules', params),
+  runComplianceAutomation: (payload) => request('/compliance-automation/run', { method: 'POST', body: JSON.stringify(payload || {}) }),
+  complianceAutomationRuns: (params) => page('/compliance-automation/runs', params),
+  complianceAutomationFindings: (params) => page('/compliance-automation/findings', params),
+
   assessmentFeedbacks: (params) => page('/assessment-feedbacks', params),
   createAssessmentFeedback: (payload) => request('/assessment-feedbacks', { method: 'POST', body: JSON.stringify(payload) }),
   updateAssessmentFeedback: (id, payload) => request(`/assessment-feedbacks/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),

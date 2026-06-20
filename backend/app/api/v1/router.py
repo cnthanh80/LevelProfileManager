@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import identity_provider, cmdb, assessment_workflow, assessment_portal, digital_dossier, real_signature, access_control, ai_classification, audit_logs, auth, checklists, compliance, dashboard, document_templates, enterprise_dashboard, executive_dashboard_v2, evidence_documents, exported_documents, health, information_systems, level_profiles, notifications, organizations, risk_register, security_requirements, security_hardening, system, users, workflow, periodic_reviews, release
+from app.api.v1.endpoints import compliance_automation, siem_integration, identity_provider, cmdb, assessment_workflow, assessment_portal, digital_dossier, real_signature, access_control, ai_classification, audit_logs, auth, checklists, compliance, dashboard, document_templates, enterprise_dashboard, executive_dashboard_v2, evidence_documents, exported_documents, health, information_systems, level_profiles, notifications, organizations, risk_register, security_requirements, security_hardening, system, users, workflow, periodic_reviews, release
 
 api_router = APIRouter()
 api_router.include_router(health.router, prefix="/health", tags=["health"])
@@ -51,3 +51,7 @@ api_router.include_router(assessment_workflow.router, tags=["assessment-workflow
 api_router.include_router(cmdb.router, tags=["cmdb", "asset-inventory"])
 
 api_router.include_router(identity_provider.router, tags=["identity-provider", "ldap-sso-production"])
+
+api_router.include_router(siem_integration.router, tags=["siem", "audit-integration", "soc-integration"])
+
+api_router.include_router(compliance_automation.router, tags=["compliance-automation", "compliance-automation-engine"])
