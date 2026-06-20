@@ -248,6 +248,15 @@ export const api = {
   complianceAutomationRuns: (params) => page('/compliance-automation/runs', params),
   complianceAutomationFindings: (params) => page('/compliance-automation/findings', params),
 
+  complianceMonitoringDashboard: () => request('/dashboard/compliance-monitoring'),
+  complianceMonitoringScore: (profileId) => request(`/compliance-monitoring/score/${profileId}`),
+  runComplianceMonitoring: (payload) => request('/compliance-monitoring/recalculate', { method: 'POST', body: JSON.stringify(payload || {}) }),
+  complianceMonitoringSnapshots: (params) => page('/compliance-monitoring/snapshots', params),
+  complianceMonitoringFindings: (params) => page('/compliance-monitoring/findings', params),
+  complianceMonitoringNotifications: (params) => page('/compliance-monitoring/notifications', params),
+  complianceMonitoringHeatmap: () => request('/compliance-monitoring/heatmap'),
+  complianceMonitoringTrends: (profileId, limit = 30) => request(`/compliance-monitoring/trends/${profileId}?limit=${limit}`),
+
   assessmentFeedbacks: (params) => page('/assessment-feedbacks', params),
   createAssessmentFeedback: (payload) => request('/assessment-feedbacks', { method: 'POST', body: JSON.stringify(payload) }),
   updateAssessmentFeedback: (id, payload) => request(`/assessment-feedbacks/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),

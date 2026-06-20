@@ -29,3 +29,5 @@ from app.models.assessment_workflow import AssessmentWorkflowEvent  # noqa
 from app.models.cmdb import CmdbAsset, CmdbApplication, CmdbDatabase, CmdbNetworkDevice, CmdbRelationship  # noqa
 from app.models.siem_integration import SiemConnector, SiemEvent, SiemCorrelationRule  # noqa
 from app.models.compliance_automation import ComplianceAutomationRule, ComplianceAutomationRun, ComplianceAutomationFinding  # noqa
+
+from app.models.compliance_monitoring import ComplianceSnapshot, ComplianceMonitoringFinding, ComplianceMonitoringNotification  # noqa

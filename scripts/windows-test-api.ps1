@@ -10,7 +10,7 @@ try {
 }
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v3.7..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v3.8.1..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -661,5 +661,31 @@ try {
 Write-Host "======================================" -ForegroundColor Green
 Write-Host "LevelProfileManager API v3.7 PASSED" -ForegroundColor Green
 Write-Host "Compliance Automation: OK" -ForegroundColor Green
+Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green
+
+Write-Host "Continuous Compliance Monitoring v3.8" -ForegroundColor Cyan
+try {
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/compliance-monitoring" | ConvertTo-Json -Depth 10
+  $monitorBody = @{ scope = "ALL_PROFILES"; create_notifications = $true } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/compliance-monitoring/recalculate" -Body $monitorBody | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/compliance-monitoring/heatmap" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/compliance-monitoring/snapshots?limit=10" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/compliance-monitoring/findings?limit=10" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/compliance-monitoring/notifications?limit=10" | ConvertTo-Json -Depth 10
+  if ($profiles.items.Count -gt 0) {
+    $profileId = $profiles.items[0].id
+    Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/compliance-monitoring/score/$profileId" | ConvertTo-Json -Depth 10
+    Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/compliance-monitoring/trends/${profileId}?limit=10" | ConvertTo-Json -Depth 10
+  }
+  Write-Host "Continuous Compliance Monitoring v3.8 OK" -ForegroundColor Green
+} catch {
+  Write-Host "Continuous Compliance Monitoring v3.8 test failed: $($_.Exception.Message)" -ForegroundColor Red
+  throw
+}
+
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v3.8 PASSED" -ForegroundColor Green
+Write-Host "Continuous Compliance Monitoring: OK" -ForegroundColor Green
 Write-Host "ALL TESTS PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green

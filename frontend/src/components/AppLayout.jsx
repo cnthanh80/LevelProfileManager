@@ -27,6 +27,7 @@ export default function AppLayout({ active, setActive, children, user }) {
     { key: 'audit', icon: <AuditOutlined />, label: 'Audit Trail' },
     { key: 'siem', icon: <ApiOutlined />, label: 'SIEM/SOC Integration' },
     { key: 'compliance-automation', icon: <ExperimentOutlined />, label: 'Compliance Automation' },
+    { key: 'compliance-monitoring', icon: <ExperimentOutlined />, label: 'Compliance Monitoring' },
     { key: 'identity-provider', icon: <KeyOutlined />, label: 'LDAP/SSO Production' },
     { key: 'admin', icon: <SettingOutlined />, label: 'Quản trị' },
     { key: 'release', icon: <FileDoneOutlined />, label: 'Release/UAT' },
@@ -50,7 +51,7 @@ export default function AppLayout({ active, setActive, children, user }) {
         <Header style={{ background: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', boxShadow: '0 1px 6px rgba(0,0,0,.08)' }}>
           <div>
             <Typography.Title level={4} style={{ margin: 0 }}>Quản lý hồ sơ đề xuất cấp độ ATHTTT</Typography.Title>
-            <Typography.Text type="secondary">Production 3.7 · ATHTTT theo cấp độ</Typography.Text>
+            <Typography.Text type="secondary">Production 3.8 · ATHTTT theo cấp độ</Typography.Text>
           </div>
           <Space>
             <Tag color="blue">{user?.role?.name || user?.role_name || 'USER'}</Tag>

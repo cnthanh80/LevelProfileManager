@@ -1,39 +1,44 @@
-# LevelProfileManager v3.7
+# LevelProfileManager v3.8
 
-Ứng dụng web quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin.
+Phase 38 - Continuous Compliance Monitoring.
 
-## v3.7 - Compliance Automation
+## Nội dung chính
 
-Bổ sung:
+- Compliance Monitoring Score Engine.
+- Snapshot tuân thủ liên tục cho từng hồ sơ.
+- Findings riêng cho monitoring: mandatory gap, evidence gap, score decrease, low score.
+- Notification dry-run cho hồ sơ có rủi ro HIGH/CRITICAL hoặc trend giảm.
+- Heatmap compliance theo hồ sơ/hệ thống/đơn vị/cấp độ.
+- API dashboard monitoring.
+- Giao diện web menu **Compliance Monitoring**.
 
-- Compliance Automation Rule Engine
-- Chạy kiểm tra tự động gap tuân thủ theo hồ sơ
-- Phát hiện tiêu chí bắt buộc chưa đáp ứng
-- Phát hiện tiêu chí đạt nhưng thiếu minh chứng
-- Phát hiện rủi ro cao chưa xử lý
-- Phát hiện hồ sơ quá hạn rà soát
-- Dashboard Compliance Automation
-- Giao diện menu **Compliance Automation**
-
-## Chạy trên Windows Docker Desktop
+## Triển khai trên Windows Docker Desktop
 
 ```powershell
 cd D:\Projects\LevelProfileManager
 docker compose down
+Get-ChildItem -Recurse *.ps1 | Unblock-File
 docker compose up -d --build
-.\scripts\windows-test-api.ps1
+powershell.exe -ExecutionPolicy Bypass -File .\scripts\windows-test-api.ps1
 ```
 
-Truy cập:
+## API chính
 
-- Frontend: http://localhost:3000
-- Swagger: http://localhost:8000/docs
+- `GET /api/v1/dashboard/compliance-monitoring`
+- `GET /api/v1/compliance-monitoring/score/{profile_id}`
+- `POST /api/v1/compliance-monitoring/recalculate`
+- `GET /api/v1/compliance-monitoring/snapshots`
+- `GET /api/v1/compliance-monitoring/findings`
+- `GET /api/v1/compliance-monitoring/notifications`
+- `GET /api/v1/compliance-monitoring/heatmap`
+- `GET /api/v1/compliance-monitoring/trends/{profile_id}`
 
-Tài khoản test:
+## Git
 
-- admin / Admin@123
-- attt / Attt@123
-
-
-## v3.7.2 Hotfix
-- Added missing ComplianceAutomationRunRequest compatibility schema.
+```powershell
+git add .
+git commit -m "Upgrade to v3.8 - continuous compliance monitoring"
+git tag v3.8
+git push
+git push origin v3.8
+```
