@@ -33,3 +33,5 @@ from app.models.compliance_automation import ComplianceAutomationRule, Complianc
 from app.models.compliance_monitoring import ComplianceSnapshot, ComplianceMonitoringFinding, ComplianceMonitoringNotification  # noqa
 
 from app.models.enterprise_reporting import EnterpriseReportSnapshot, DataWarehouseMetric, ReportExportJob  # noqa
+
+from app.models.enterprise_center import EnterpriseConfiguration, EnterpriseHealthCheck, EnterpriseJobSchedule, DataRetentionPolicy, BackupRecord  # noqa

@@ -29,3 +29,29 @@ git tag v3.9
 git push
 git push origin v3.9
 ```
+
+
+## LevelProfileManager v4.0 - Enterprise Release
+
+Phase 40 bổ sung Enterprise Center cho vận hành production:
+
+- Enterprise Configuration Center
+- System Health Center
+- Job Scheduler Center
+- Data Retention Policy
+- Backup & Recovery Center
+- Enterprise Readiness Dashboard
+
+API chính:
+
+- `GET /api/v1/enterprise-center/dashboard`
+- `POST /api/v1/enterprise-center/seed-defaults`
+- `GET /api/v1/enterprise-center/health`
+- `GET /api/v1/enterprise-center/readiness`
+- `GET /api/v1/enterprise-center/configurations`
+- `GET /api/v1/enterprise-center/jobs`
+- `GET /api/v1/enterprise-center/retention-policies`
+- `POST /api/v1/enterprise-center/backups/mock`
+- `POST /api/v1/enterprise-center/backups/{id}/validate`
+
+Frontend: menu **Enterprise Center v4.0**.

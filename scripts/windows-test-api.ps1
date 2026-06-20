@@ -10,7 +10,7 @@ try {
 }
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v3.8.1..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v4.0..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -709,5 +709,31 @@ try {
 Write-Host "======================================" -ForegroundColor Green
 Write-Host "LevelProfileManager API v3.9 PASSED" -ForegroundColor Green
 Write-Host "Enterprise Reporting & Data Warehouse: OK" -ForegroundColor Green
+Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green
+
+Write-Host "Enterprise Release v4.0" -ForegroundColor Cyan
+try {
+  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/enterprise-center/seed-defaults" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/enterprise-center/dashboard" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/enterprise-center/readiness" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/enterprise-center/health" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/enterprise-center/configurations?limit=20" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/enterprise-center/jobs?limit=20" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/enterprise-center/retention-policies?limit=20" | ConvertTo-Json -Depth 10
+  $backupBody = @{ backup_type = "LOGICAL"; scope = "DATABASE"; status = "COMPLETED"; size_mb = 128; notes = "v4.0 test backup metadata" } | ConvertTo-Json
+  $backup = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/enterprise-center/backups/mock" -Body $backupBody
+  $backup | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/enterprise-center/backups/$($backup.id)/validate" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/enterprise-center/backups?limit=10" | ConvertTo-Json -Depth 10
+  Write-Host "Enterprise Release v4.0 OK" -ForegroundColor Green
+} catch {
+  Write-Host "Enterprise Release v4.0 test failed: $($_.Exception.Message)" -ForegroundColor Red
+  throw
+}
+
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v4.0 PASSED" -ForegroundColor Green
+Write-Host "Enterprise Release: OK" -ForegroundColor Green
 Write-Host "ALL TESTS PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green

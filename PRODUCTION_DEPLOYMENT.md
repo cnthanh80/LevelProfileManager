@@ -1,93 +1,48 @@
-# LevelProfileManager v3.6 - SIEM & Audit Integration
+# LevelProfileManager v4.0 - Enterprise Release Deployment
 
-
-## 1. Mục tiêu
-
-Bản v3.0 là baseline sẵn sàng UAT/production pilot cho ứng dụng quản lý hồ sơ đề xuất cấp độ an toàn hệ thống thông tin.
-
-## 2. Chuẩn bị cấu hình
-
-Trước khi triển khai production, cập nhật `backend/.env`:
-
-```env
-APP_ENV=production
-APP_VERSION=3.0.0
-JWT_SECRET_KEY=<chuoi-bi-mat-manh>
-CORS_ALLOWED_ORIGINS=https://<ten-mien-noi-bo>
-RATE_LIMIT_ENABLED=true
-SECURITY_HEADERS_ENABLED=true
-NOTIFICATION_DRY_RUN=false
-```
-
-Nếu chưa cấu hình SMTP/Telegram thật, giữ `NOTIFICATION_DRY_RUN=true` trong UAT.
-
-## 3. Chạy production compose
+## Run on Windows Docker Desktop
 
 ```powershell
-docker compose -f docker-compose.prod.yml up -d --build
+cd D:\Projects\LevelProfileManager
+docker compose down
+Get-ChildItem -Recurse *.ps1 | Unblock-File
+docker compose up -d --build
+powershell.exe -ExecutionPolicy Bypass -File .\scripts\windows-test-api.ps1
+powershell.exe -ExecutionPolicy Bypass -File .\scripts\windows-production-check.ps1
 ```
 
-Kiểm tra:
+## Web UI
 
-```powershell
-.\scripts\windows-production-check.ps1
-```
+- Frontend: http://localhost:3000
+- Swagger: http://localhost:8000/docs
 
-## 4. Backup và restore
-
-Backup:
-
-```powershell
-.\scripts\windows-backup-db.ps1
-```
-
-Restore:
-
-```powershell
-.\scripts\windows-restore-db.ps1 -BackupFile .\backups\level_profile_db_YYYYMMDD_HHMMSS.sql
-```
-
-## 5. Checklist go-live
-
-- Đổi `JWT_SECRET_KEY`.
-- Bật `RATE_LIMIT_ENABLED=true`.
-- Giới hạn CORS theo domain nội bộ.
-- Cấu hình SMTP/Telegram thật hoặc xác nhận dry-run cho UAT.
-- Cấu hình LDAP/SSO theo hạ tầng định danh.
-- Kiểm tra backup/restore.
-- Kiểm tra quyền truy cập theo đơn vị.
-- Kiểm tra audit log và security events.
-- Kiểm tra xuất hồ sơ DOCX/PDF.
-- Kiểm tra ký số: hiện là mock signing, cần tích hợp CA/HSM/remote signing trước khi dùng ký chính thức.
-
-## 6. Tài khoản UAT mặc định
+Default test account:
 
 ```text
 admin / Admin@123
-attt / Attt@123
 ```
 
-Đổi mật khẩu ngay khi dùng dữ liệu thật.
+## v4.0 Enterprise Center
 
+New menu: **Enterprise Center v4.0**
 
-## v3.3 - Workflow thẩm định đa cấp
+Main capabilities:
 
-- Bổ sung assessment_workflow_events.
-- Bổ sung rule engine cho quy trình gửi thẩm định, nhận ý kiến, giải trình, phê duyệt và ban hành quyết định.
-- Bổ sung API /assessment-workflow/summary, /assessment-workflow/rules, /assessment-cases/{id}/workflow-transition.
-- Bổ sung giao diện Workflow thẩm định.
+- Enterprise Configuration Center
+- System Health Center
+- Job Scheduler Center
+- Data Retention Policy
+- Backup & Recovery Center
+- Enterprise Readiness Dashboard
 
+Main APIs:
 
-## v3.6 SIEM/SOC Production Notes
-
-Khi triển khai thực tế, có thể tích hợp nguồn CMDB/Excel nội bộ, GLPI, iTop, ServiceNow hoặc dữ liệu inventory từ hệ thống giám sát. Nên quy định mã tài sản chuẩn và quy trình cập nhật định kỳ.
-
-## v3.6 - SIEM/SOC Integration Notes
-
-Khi triển khai production cần cấu hình:
-
-1. Kênh gửi sự kiện ra SIEM qua HTTPS webhook, syslog hoặc message queue.
-2. TLS/mTLS giữa LevelProfileManager và SIEM Collector.
-3. Token/API key lưu bằng secret manager, không lưu plaintext trong `.env`.
-4. Cho phép mapping sự kiện từ `audit_logs`, `security_events`, ký số, workflow và API errors.
-5. SOC cần định nghĩa rule thực tế cho hồ sơ cấp độ 3 trở lên, hồ sơ quá hạn và thay đổi không đúng quy trình.
+- `GET /api/v1/enterprise-center/dashboard`
+- `POST /api/v1/enterprise-center/seed-defaults`
+- `GET /api/v1/enterprise-center/health`
+- `GET /api/v1/enterprise-center/readiness`
+- `GET /api/v1/enterprise-center/configurations`
+- `GET /api/v1/enterprise-center/jobs`
+- `GET /api/v1/enterprise-center/retention-policies`
+- `POST /api/v1/enterprise-center/backups/mock`
+- `POST /api/v1/enterprise-center/backups/{backup_id}/validate`

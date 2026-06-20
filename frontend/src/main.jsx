@@ -29,6 +29,7 @@ import SiemIntegrationPage from './pages/SiemIntegrationPage';
 import ComplianceAutomationPage from './pages/ComplianceAutomationPage';
 import ComplianceMonitoringPage from './pages/ComplianceMonitoringPage';
 import EnterpriseReportingPage from './pages/EnterpriseReportingPage';
+import EnterpriseCenterPage from './pages/EnterpriseCenterPage';
 import { api, clearToken, getToken } from './api/client';
 
 function pickItems(x) { return Array.isArray(x?.items) ? x.items : Array.isArray(x) ? x : []; }
@@ -89,6 +90,7 @@ function App() {
   if (active === 'compliance-automation') page = <ComplianceAutomationPage profiles={data.profiles} />;
   if (active === 'compliance-monitoring') page = <ComplianceMonitoringPage profiles={data.profiles} />;
   if (active === 'enterprise-reporting') page = <EnterpriseReportingPage />;
+  if (active === 'enterprise-center') page = <EnterpriseCenterPage />;
   if (active === 'release') page = <ReleasePage />;
 
   return <ConfigProvider theme={{ token: { borderRadius: 8 } }}>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Menu, Typography, Button, Space, Avatar, Tag } from 'antd';
-import { ApartmentOutlined, AuditOutlined, BarChartOutlined, BellOutlined, CrownOutlined, DatabaseOutlined, FileDoneOutlined, FileProtectOutlined, FileTextOutlined, RobotOutlined, SignatureOutlined, LogoutOutlined, SafetyCertificateOutlined, SettingOutlined, SolutionOutlined, SyncOutlined, SnippetsOutlined, WarningOutlined, SendOutlined, BranchesOutlined, CloudServerOutlined, KeyOutlined, ApiOutlined, ExperimentOutlined } from '@ant-design/icons';
+import { ApartmentOutlined, AuditOutlined, BarChartOutlined, BellOutlined, CrownOutlined, DatabaseOutlined, FileDoneOutlined, FileProtectOutlined, FileTextOutlined, RobotOutlined, SignatureOutlined, LogoutOutlined, SafetyCertificateOutlined, SettingOutlined, SolutionOutlined, SyncOutlined, SnippetsOutlined, WarningOutlined, SendOutlined, BranchesOutlined, CloudServerOutlined, KeyOutlined, ApiOutlined, ExperimentOutlined, ControlOutlined } from '@ant-design/icons';
 import { clearToken } from '../api/client';
 
 const { Header, Sider, Content } = Layout;
@@ -29,6 +29,7 @@ export default function AppLayout({ active, setActive, children, user }) {
     { key: 'compliance-automation', icon: <ExperimentOutlined />, label: 'Compliance Automation' },
     { key: 'compliance-monitoring', icon: <ExperimentOutlined />, label: 'Compliance Monitoring' },
     { key: 'enterprise-reporting', icon: <BarChartOutlined />, label: 'Enterprise Reporting' },
+    { key: 'enterprise-center', icon: <ControlOutlined />, label: 'Enterprise Center v4.0' },
     { key: 'identity-provider', icon: <KeyOutlined />, label: 'LDAP/SSO Production' },
     { key: 'admin', icon: <SettingOutlined />, label: 'Quản trị' },
     { key: 'release', icon: <FileDoneOutlined />, label: 'Release/UAT' },
@@ -52,7 +53,7 @@ export default function AppLayout({ active, setActive, children, user }) {
         <Header style={{ background: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px', boxShadow: '0 1px 6px rgba(0,0,0,.08)' }}>
           <div>
             <Typography.Title level={4} style={{ margin: 0 }}>Quản lý hồ sơ đề xuất cấp độ ATHTTT</Typography.Title>
-            <Typography.Text type="secondary">Production 3.9 · ATHTTT theo cấp độ</Typography.Text>
+            <Typography.Text type="secondary">Enterprise 4.0 · ATHTTT theo cấp độ</Typography.Text>
           </div>
           <Space>
             <Tag color="blue">{user?.role?.name || user?.role_name || 'USER'}</Tag>

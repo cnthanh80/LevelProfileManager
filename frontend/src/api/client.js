@@ -268,4 +268,16 @@ export const api = {
   enterpriseReportSnapshots: (params) => page('/enterprise-reporting/snapshots', params),
   enterpriseDataWarehouseMetrics: (params) => page('/enterprise-reporting/data-warehouse/metrics', params),
   enterprisePortfolioCsvUrl: () => downloadUrl('/enterprise-reporting/export/portfolio-csv'),
+
+  enterpriseCenterDashboard: () => request('/enterprise-center/dashboard'),
+  enterpriseSeedDefaults: () => request('/enterprise-center/seed-defaults', { method: 'POST' }),
+  enterpriseReadiness: () => request('/enterprise-center/readiness'),
+  enterpriseHealth: () => request('/enterprise-center/health'),
+  enterpriseConfigurations: (params) => page('/enterprise-center/configurations', params),
+  enterpriseJobs: (params) => page('/enterprise-center/jobs', params),
+  enterpriseRetentionPolicies: (params) => page('/enterprise-center/retention-policies', params),
+  enterpriseBackups: (params) => page('/enterprise-center/backups', params),
+  enterpriseCreateMockBackup: (payload) => request('/enterprise-center/backups/mock', { method: 'POST', body: JSON.stringify(payload) }),
+  enterpriseValidateBackup: (id) => request(`/enterprise-center/backups/${id}/validate`, { method: 'POST' }),
+
 };
