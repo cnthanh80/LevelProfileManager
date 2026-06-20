@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import assessment_portal, digital_dossier, real_signature, access_control, ai_classification, audit_logs, auth, checklists, compliance, dashboard, document_templates, enterprise_dashboard, executive_dashboard_v2, evidence_documents, exported_documents, health, information_systems, level_profiles, notifications, organizations, risk_register, security_requirements, security_hardening, system, users, workflow, periodic_reviews, release
+from app.api.v1.endpoints import assessment_workflow, assessment_portal, digital_dossier, real_signature, access_control, ai_classification, audit_logs, auth, checklists, compliance, dashboard, document_templates, enterprise_dashboard, executive_dashboard_v2, evidence_documents, exported_documents, health, information_systems, level_profiles, notifications, organizations, risk_register, security_requirements, security_hardening, system, users, workflow, periodic_reviews, release
 
 api_router = APIRouter()
 api_router.include_router(health.router, prefix="/health", tags=["health"])
@@ -45,3 +45,5 @@ api_router.include_router(executive_dashboard_v2.router, tags=["executive-dashbo
 api_router.include_router(ai_classification.router, tags=["ai-classification", "level-recommendation"])
 
 api_router.include_router(real_signature.router, tags=["real-digital-signature", "signature-gateway"])
+
+api_router.include_router(assessment_workflow.router, tags=["assessment-workflow", "external-assessment-workflow"])

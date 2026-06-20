@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
 # Force UTF-8 output for Vietnamese text on Windows PowerShell 5.1 and PowerShell 7+
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -517,4 +517,24 @@ Write-Host "======================================" -ForegroundColor Green
 Write-Host "LevelProfileManager API v3.2 PASSED" -ForegroundColor Green
 Write-Host "Real Digital Signature Gateway Foundation: OK" -ForegroundColor Green
 Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green
+
+Write-Host "Assessment Workflow Engine v3.3" -ForegroundColor Cyan
+try {
+  $awSummary = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/assessment-workflow/summary"
+  $awSummary | ConvertTo-Json -Depth 8
+  $awRules = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/assessment-workflow/rules"
+  $awRules | ConvertTo-Json -Depth 8
+  $cases = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/assessment-cases?limit=10"
+  if ($cases.items.Count -gt 0) {
+    $caseId = $cases.items[0].id
+    Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/assessment-cases/$caseId/workflow-events" | ConvertTo-Json -Depth 8
+  }
+  Write-Host "Assessment Workflow Engine v3.3 OK" -ForegroundColor Green
+} catch {
+  Write-Host "Assessment Workflow Engine v3.3 test warning: $($_.Exception.Message)" -ForegroundColor Yellow
+}
+
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v3.3 PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green

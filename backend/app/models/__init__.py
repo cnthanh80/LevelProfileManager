@@ -20,3 +20,4 @@ from app.models.ai_level_recommendation import AiLevelRecommendation  # noqa
 
 from app.models.signature_provider import SignatureProvider  # noqa
 from app.models.signature_request import SignatureRequest  # noqa
+from app.models.assessment_workflow import AssessmentWorkflowEvent  # noqa

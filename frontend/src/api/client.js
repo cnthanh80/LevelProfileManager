@@ -198,6 +198,11 @@ export const api = {
   signatureRequests: (params) => page('/signature-requests', params),
   simulateSignatureCallback: (requestCode) => request(`/signature-requests/${requestCode}/simulate-callback`, { method: 'POST' }),
 
+
+  assessmentWorkflowSummary: () => request('/assessment-workflow/summary'),
+  assessmentWorkflowRules: () => request('/assessment-workflow/rules'),
+  assessmentWorkflowEvents: (caseId) => request(`/assessment-cases/${caseId}/workflow-events`),
+  transitionAssessmentWorkflow: (caseId, payload) => request(`/assessment-cases/${caseId}/workflow-transition`, { method: 'POST', body: JSON.stringify(payload || {}) }),
   assessmentFeedbacks: (params) => page('/assessment-feedbacks', params),
   createAssessmentFeedback: (payload) => request('/assessment-feedbacks', { method: 'POST', body: JSON.stringify(payload) }),
   updateAssessmentFeedback: (id, payload) => request(`/assessment-feedbacks/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),

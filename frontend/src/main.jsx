@@ -19,6 +19,7 @@ import AdminPage from './pages/AdminPage';
 import ReleasePage from './pages/ReleasePage';
 import RiskSlaPage from './pages/RiskSlaPage';
 import AssessmentPortalPage from './pages/AssessmentPortalPage';
+import AssessmentWorkflowPage from './pages/AssessmentWorkflowPage';
 import ExecutiveDashboardPage from './pages/ExecutiveDashboardPage';
 import AiClassificationPage from './pages/AiClassificationPage';
 import RealSignaturePage from './pages/RealSignaturePage';
@@ -71,6 +72,7 @@ function App() {
   if (active === 'reviews') page = <ReviewsPage />;
   if (active === 'risk-sla') page = <RiskSlaPage profiles={data.profiles} systems={data.systems} />;
   if (active === 'assessment') page = <AssessmentPortalPage profiles={data.profiles} />;
+  if (active === 'assessment-workflow') page = <AssessmentWorkflowPage />;
   if (active === 'executive') page = <ExecutiveDashboardPage />;
   if (active === 'notifications') page = <NotificationsPage />;
   if (active === 'audit') page = <AuditPage />;

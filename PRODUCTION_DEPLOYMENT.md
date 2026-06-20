@@ -1,4 +1,5 @@
-# LevelProfileManager v3.0 - Production Deployment Guide
+# LevelProfileManager v3.3 - External Assessment Workflow
+
 
 ## 1. Mục tiêu
 
@@ -67,3 +68,11 @@ attt / Attt@123
 ```
 
 Đổi mật khẩu ngay khi dùng dữ liệu thật.
+
+
+## v3.3 - Workflow thẩm định đa cấp
+
+- Bổ sung assessment_workflow_events.
+- Bổ sung rule engine cho quy trình gửi thẩm định, nhận ý kiến, giải trình, phê duyệt và ban hành quyết định.
+- Bổ sung API /assessment-workflow/summary, /assessment-workflow/rules, /assessment-cases/{id}/workflow-transition.
+- Bổ sung giao diện Workflow thẩm định.
