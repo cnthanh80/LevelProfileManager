@@ -1,4 +1,5 @@
-# LevelProfileManager v3.3 - External Assessment Workflow
+# LevelProfileManager v3.4 - CMDB & Asset Inventory Integration
+
 
 
 Phase 32 - Real Digital Signature Gateway Foundation.
@@ -66,3 +67,13 @@ admin / Admin@123
 - Bổ sung rule engine cho quy trình gửi thẩm định, nhận ý kiến, giải trình, phê duyệt và ban hành quyết định.
 - Bổ sung API /assessment-workflow/summary, /assessment-workflow/rules, /assessment-cases/{id}/workflow-transition.
 - Bổ sung giao diện Workflow thẩm định.
+
+## v3.4 - CMDB & Asset Inventory Integration
+
+- Quản lý tài sản CNTT: máy chủ, thiết bị bảo mật, storage, VM.
+- Quản lý ứng dụng, CSDL, thiết bị mạng.
+- Import nhanh asset từ JSON payload.
+- Mapping tài sản với hệ thống thông tin.
+- Đồng bộ dữ liệu CMDB vào thuyết minh phạm vi và kiến trúc hồ sơ.
+- Dashboard CMDB và cảnh báo hồ sơ thiếu tài sản.
+- Giao diện CMDB/Tài sản CNTT trên frontend.

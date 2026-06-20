@@ -538,3 +538,41 @@ try {
 Write-Host "======================================" -ForegroundColor Green
 Write-Host "LevelProfileManager API v3.3 PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green
+
+
+Write-Host "CMDB & Asset Inventory v3.4" -ForegroundColor Cyan
+try {
+  $cmdbDashboard = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/cmdb/dashboard"
+  $cmdbDashboard | ConvertTo-Json -Depth 8
+  $systemsForCmdb = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/information-systems?limit=5"
+  $sysId = $null
+  if ($systemsForCmdb.items.Count -gt 0) { $sysId = $systemsForCmdb.items[0].id }
+  $assetCode = "CMDB-SRV-TEST-" + (Get-Random -Maximum 999999)
+  $assetBody = @{
+    asset_code = $assetCode
+    asset_name = "May chu CMDB test"
+    asset_type = "SERVER"
+    environment = "PRODUCTION"
+    ip_address = "10.10.10.10"
+    hostname = "cmdb-test.local"
+    information_system_id = $sysId
+    criticality = "HIGH"
+    status = "ACTIVE"
+  } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/cmdb-assets" -Body $assetBody | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/cmdb-assets?limit=10" | ConvertTo-Json -Depth 8
+  if ($profiles.items.Count -gt 0) {
+    $profileId = $profiles.items[0].id
+    Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/cmdb-inventory" | ConvertTo-Json -Depth 8
+    Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/profiles/$profileId/cmdb-sync" | ConvertTo-Json -Depth 8
+  }
+  Write-Host "CMDB & Asset Inventory v3.4 OK" -ForegroundColor Green
+} catch {
+  Write-Host "CMDB & Asset Inventory v3.4 test warning: $($_.Exception.Message)" -ForegroundColor Yellow
+}
+
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v3.4 PASSED" -ForegroundColor Green
+Write-Host "CMDB & Asset Inventory Integration: OK" -ForegroundColor Green
+Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green

@@ -23,6 +23,7 @@ import AssessmentWorkflowPage from './pages/AssessmentWorkflowPage';
 import ExecutiveDashboardPage from './pages/ExecutiveDashboardPage';
 import AiClassificationPage from './pages/AiClassificationPage';
 import RealSignaturePage from './pages/RealSignaturePage';
+import CmdbPage from './pages/CmdbPage';
 import { api, clearToken, getToken } from './api/client';
 
 function pickItems(x) { return Array.isArray(x?.items) ? x.items : Array.isArray(x) ? x : []; }
@@ -73,6 +74,7 @@ function App() {
   if (active === 'risk-sla') page = <RiskSlaPage profiles={data.profiles} systems={data.systems} />;
   if (active === 'assessment') page = <AssessmentPortalPage profiles={data.profiles} />;
   if (active === 'assessment-workflow') page = <AssessmentWorkflowPage />;
+  if (active === 'cmdb') page = <CmdbPage profiles={data.profiles} systems={data.systems} />;
   if (active === 'executive') page = <ExecutiveDashboardPage />;
   if (active === 'notifications') page = <NotificationsPage />;
   if (active === 'audit') page = <AuditPage />;
