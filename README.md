@@ -1,18 +1,19 @@
-# LevelProfileManager v2.5
+# LevelProfileManager v2.6
 
-Phiên bản v2.5 bổ sung **SLA & Risk Register** trên nền v2.4.1.
+Phase 26 – Assessment Portal.
+
+Bản này kế thừa v2.5 và bổ sung cổng thẩm định hồ sơ đề xuất cấp độ.
 
 ## Tính năng mới
 
-- Quản lý danh mục rủi ro theo hồ sơ/hệ thống.
-- Tính điểm rủi ro theo likelihood x impact.
-- Phân loại LOW/MEDIUM/HIGH/CRITICAL.
-- Theo dõi trạng thái xử lý rủi ro.
-- Quản lý chính sách SLA theo trạng thái workflow.
-- Dashboard cảnh báo SLA warning/breached.
-- Giao diện web menu **SLA & Risk Register**.
+- Quản lý hồ sơ gửi thẩm định.
+- Theo dõi trạng thái: `DRAFT`, `SUBMITTED`, `COMMENTED`, `COMPLETED`.
+- Tiếp nhận ý kiến thẩm định.
+- Phản hồi ý kiến thẩm định.
+- Dashboard tóm tắt thẩm định.
+- Giao diện web menu **Cổng thẩm định**.
 
-## Chạy kiểm tra
+## Chạy trên Windows Docker Desktop
 
 ```powershell
 cd D:\Projects\LevelProfileManager
@@ -21,12 +22,23 @@ docker compose up -d --build
 .\scripts\windows-test-api.ps1
 ```
 
-## Commit
+## Truy cập
+
+- Frontend: http://localhost:3000
+- Backend Swagger: http://localhost:8000/docs
+
+User mặc định:
+
+```text
+admin / Admin@123
+```
+
+## Git
 
 ```powershell
 git add .
-git commit -m "Upgrade to v2.5 - SLA and risk register"
-git tag v2.5
+git commit -m "Upgrade to v2.6 - assessment portal"
+git tag v2.6
 git push
-git push origin v2.5
+git push origin v2.6
 ```

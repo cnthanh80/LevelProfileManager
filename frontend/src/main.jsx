@@ -18,6 +18,7 @@ import AuditPage from './pages/AuditPage';
 import AdminPage from './pages/AdminPage';
 import ReleasePage from './pages/ReleasePage';
 import RiskSlaPage from './pages/RiskSlaPage';
+import AssessmentPortalPage from './pages/AssessmentPortalPage';
 import { api, clearToken, getToken } from './api/client';
 
 function pickItems(x) { return Array.isArray(x?.items) ? x.items : Array.isArray(x) ? x : []; }
@@ -64,6 +65,7 @@ function App() {
   if (active === 'dossier') page = <DigitalDossierPage profiles={data.profiles} />;
   if (active === 'reviews') page = <ReviewsPage />;
   if (active === 'risk-sla') page = <RiskSlaPage profiles={data.profiles} systems={data.systems} />;
+  if (active === 'assessment') page = <AssessmentPortalPage profiles={data.profiles} />;
   if (active === 'notifications') page = <NotificationsPage />;
   if (active === 'audit') page = <AuditPage />;
   if (active === 'admin') page = <AdminPage />;

@@ -23,3 +23,5 @@ from app.models.security_event import SecurityEvent  # noqa
 
 from app.models.profile_version import ProfileVersion  # noqa
 from app.models.profile_signature import ProfileSignature  # noqa
+
+from app.models.assessment_portal import AssessmentCase, AssessmentFeedback  # noqa

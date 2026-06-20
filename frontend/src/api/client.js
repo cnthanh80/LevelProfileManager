@@ -171,4 +171,15 @@ export const api = {
   createSlaPolicy: (payload) => request('/sla/policies', { method: 'POST', body: JSON.stringify(payload) }),
   seedSlaPolicies: () => request('/sla/policies/seed-defaults', { method: 'POST' }),
   slaSummary: () => request('/sla/summary'),
+
+  assessmentPortalSummary: () => request('/assessment-portal/summary'),
+  assessmentCases: (params) => page('/assessment-cases', params),
+  createAssessmentCase: (payload) => request('/assessment-cases', { method: 'POST', body: JSON.stringify(payload) }),
+  updateAssessmentCase: (id, payload) => request(`/assessment-cases/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+  submitAssessmentCase: (id) => request(`/assessment-cases/${id}/submit`, { method: 'POST' }),
+  completeAssessmentCase: (id) => request(`/assessment-cases/${id}/complete`, { method: 'POST' }),
+  assessmentFeedbacks: (params) => page('/assessment-feedbacks', params),
+  createAssessmentFeedback: (payload) => request('/assessment-feedbacks', { method: 'POST', body: JSON.stringify(payload) }),
+  updateAssessmentFeedback: (id, payload) => request(`/assessment-feedbacks/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+  respondAssessmentFeedback: (id, payload) => request(`/assessment-feedbacks/${id}/respond`, { method: 'POST', body: JSON.stringify(payload) }),
 };

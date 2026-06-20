@@ -381,3 +381,40 @@ Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/risk-registers?limit=20" | 
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/risk-registers/summary" | ConvertTo-Json -Depth 10
 Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/risk-registers/$($risk.id)/close" | ConvertTo-Json -Depth 8
 Write-Host "v2.5 SLA and Risk Register test completed" -ForegroundColor Green
+
+Write-Host "Assessment Portal v2.6" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/assessment-portal/summary" | ConvertTo-Json -Depth 10
+if ($profiles.items.Count -gt 0) {
+  $profileId = $profiles.items[0].id
+  $caseCode = "TD-TEST-" + (Get-Date -Format "yyyyMMddHHmmss")
+  $caseBody = @{
+    case_code = $caseCode
+    profile_id = $profileId
+    title = "Ho so gui tham dinh test v2.6"
+    assessment_unit = "Don vi tham dinh chuyen mon"
+    contact_person = "Can bo tham dinh"
+    contact_email = "assessor@example.com"
+    summary = "Ho so tao tu script test Assessment Portal"
+  } | ConvertTo-Json
+  $case = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/assessment-cases" -Body $caseBody
+  $case | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/assessment-cases/$($case.id)/submit" | ConvertTo-Json -Depth 8
+
+  $feedbackBody = @{
+    case_id = $case.id
+    profile_id = $profileId
+    feedback_type = "REQUEST_CHANGE"
+    severity = "HIGH"
+    title = "Yeu cau bo sung minh chung"
+    content = "De nghi bo sung tai lieu minh chung ve phuong an sao luu va giam sat ATTT."
+  } | ConvertTo-Json
+  $feedback = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/assessment-feedbacks" -Body $feedbackBody
+  $feedback | ConvertTo-Json -Depth 8
+  $responseBody = @{ response = "Da tiep thu va bo sung minh chung theo yeu cau tham dinh"; status = "RESPONDED" } | ConvertTo-Json
+  Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/assessment-feedbacks/$($feedback.id)/respond" -Body $responseBody | ConvertTo-Json -Depth 8
+  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/assessment-cases/$($case.id)/complete" | ConvertTo-Json -Depth 8
+}
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/assessment-cases?limit=20" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/assessment-feedbacks?limit=20" | ConvertTo-Json -Depth 8
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/assessment-portal/summary" | ConvertTo-Json -Depth 10
+Write-Host "v2.6 assessment portal test completed" -ForegroundColor Green

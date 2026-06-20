@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import digital_dossier, access_control, audit_logs, auth, checklists, compliance, dashboard, document_templates, enterprise_dashboard, evidence_documents, exported_documents, health, information_systems, level_profiles, notifications, organizations, risk_register, security_requirements, security_hardening, system, users, workflow, periodic_reviews, release
+from app.api.v1.endpoints import assessment_portal, digital_dossier, access_control, audit_logs, auth, checklists, compliance, dashboard, document_templates, enterprise_dashboard, evidence_documents, exported_documents, health, information_systems, level_profiles, notifications, organizations, risk_register, security_requirements, security_hardening, system, users, workflow, periodic_reviews, release
 
 api_router = APIRouter()
 api_router.include_router(health.router, prefix="/health", tags=["health"])
@@ -37,3 +37,5 @@ api_router.include_router(release.router, tags=["release-2.0", "uat-readiness"])
 api_router.include_router(digital_dossier.router, tags=["digital-dossier", "digital-signature"])
 
 api_router.include_router(risk_register.router, tags=["risk-register", "sla-management"])
+
+api_router.include_router(assessment_portal.router, tags=["assessment-portal"])
