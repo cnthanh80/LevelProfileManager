@@ -1,0 +1,6 @@
+code,name,owner_unit,operator_unit,suggested_level,environment,deployment_model
+COREBANKING,Core Banking,TTCNTT,QTHT,4,production,on-premise
+MOBILEBANKING,Mobile Banking,TTCNTT,QTHT,3,production,hybrid
+ESB,Enterprise Service Bus,TTCNTT,QTHT,3,production,on-premise
+CITAD,CITAD Payment System,TTCNTT,QTHT,3,production,on-premise
+INTERNAL-WEB,Website nội bộ,TTCNTT,QTHT,2,production,on-premise
