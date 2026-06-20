@@ -21,6 +21,7 @@ import RiskSlaPage from './pages/RiskSlaPage';
 import AssessmentPortalPage from './pages/AssessmentPortalPage';
 import ExecutiveDashboardPage from './pages/ExecutiveDashboardPage';
 import AiClassificationPage from './pages/AiClassificationPage';
+import RealSignaturePage from './pages/RealSignaturePage';
 import { api, clearToken, getToken } from './api/client';
 
 function pickItems(x) { return Array.isArray(x?.items) ? x.items : Array.isArray(x) ? x : []; }
@@ -66,6 +67,7 @@ function App() {
   if (active === 'documents') page = <DocumentsPage profiles={data.profiles} />;
   if (active === 'templates') page = <TemplateCenterPage profiles={data.profiles} />;
   if (active === 'dossier') page = <DigitalDossierPage profiles={data.profiles} />;
+  if (active === 'real-signature') page = <RealSignaturePage profiles={data.profiles} />;
   if (active === 'reviews') page = <ReviewsPage />;
   if (active === 'risk-sla') page = <RiskSlaPage profiles={data.profiles} systems={data.systems} />;
   if (active === 'assessment') page = <AssessmentPortalPage profiles={data.profiles} />;

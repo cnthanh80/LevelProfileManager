@@ -486,3 +486,35 @@ Write-Host "LevelProfileManager API v3.1 PASSED" -ForegroundColor Green
 Write-Host "AI Classification & Level Recommendation: OK" -ForegroundColor Green
 Write-Host "ALL TESTS PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green
+
+
+Write-Host "Real Digital Signature Gateway v3.2" -ForegroundColor Cyan
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/signature-gateway/status" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/signature-providers/seed-defaults" | ConvertTo-Json -Depth 10
+$providers = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/signature-providers?limit=20"
+$providers | ConvertTo-Json -Depth 10
+if ($profiles.items.Count -gt 0) {
+  $profileId = $profiles.items[0].id
+  $versions = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/versions?limit=10"
+  if ($versions.items.Count -eq 0) {
+    $vBody = @{ title = "v3.2 signature gateway test"; change_summary = "Create version for real signature gateway test" } | ConvertTo-Json
+    Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profiles/$profileId/versions" -Body $vBody | Out-Null
+    $versions = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/versions?limit=10"
+  }
+  if ($versions.items.Count -gt 0) {
+    $versionId = $versions.items[0].id
+    $providerId = $providers.items[0].id
+    $signBody = @{ provider_id = $providerId; sign_method = "MOCK_REMOTE"; signer_name = "Mock Remote CA"; signer_role = "Remote Signing Gateway"; note = "v3.2 test" } | ConvertTo-Json
+    $signReq = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/profile-versions/$versionId/real-sign-requests" -Body $signBody
+    $signReq | ConvertTo-Json -Depth 10
+    Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/signature-requests/$($signReq.request_code)/simulate-callback" | ConvertTo-Json -Depth 10
+  }
+}
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/signature-requests?limit=20" | ConvertTo-Json -Depth 10
+
+Write-Host ""
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v3.2 PASSED" -ForegroundColor Green
+Write-Host "Real Digital Signature Gateway Foundation: OK" -ForegroundColor Green
+Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green

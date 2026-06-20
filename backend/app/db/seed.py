@@ -10,6 +10,7 @@ from app.models.security_requirement import SecurityRequirement
 from app.models.user import User
 from app.services.template_engine import seed_default_templates
 from app.services.organization_service import compute_org_level_path
+from app.services.real_signature_service import seed_default_signature_providers
 
 ROLES = [
     ("ADMIN", "Quản trị hệ thống", "Toàn quyền cấu hình và quản trị người dùng"),
@@ -198,6 +199,7 @@ def seed() -> None:
 
         db.commit()
         seed_default_templates(db)
+        seed_default_signature_providers(db)
         print("Seed data completed")
     finally:
         db.close()
