@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Level Profile Manager"
     APP_ENV: str = "development"
     API_V1_PREFIX: str = "/api/v1"
-    APP_VERSION: str = "3.0.0"
+    APP_VERSION: str = "3.1.0"
     DEBUG: bool = False
     DATABASE_URL: str
     JWT_SECRET_KEY: str

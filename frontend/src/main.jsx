@@ -20,6 +20,7 @@ import ReleasePage from './pages/ReleasePage';
 import RiskSlaPage from './pages/RiskSlaPage';
 import AssessmentPortalPage from './pages/AssessmentPortalPage';
 import ExecutiveDashboardPage from './pages/ExecutiveDashboardPage';
+import AiClassificationPage from './pages/AiClassificationPage';
 import { api, clearToken, getToken } from './api/client';
 
 function pickItems(x) { return Array.isArray(x?.items) ? x.items : Array.isArray(x) ? x : []; }
@@ -61,6 +62,7 @@ function App() {
   if (active === 'systems') page = <SystemsPage items={data.systems} reload={load} />;
   if (active === 'profiles') page = <ProfilesPage items={data.profiles} systems={data.systems} reload={load} />;
   if (active === 'compliance') page = <CompliancePage profiles={data.profiles} />;
+  if (active === 'ai-classification') page = <AiClassificationPage profiles={data.profiles} />;
   if (active === 'documents') page = <DocumentsPage profiles={data.profiles} />;
   if (active === 'templates') page = <TemplateCenterPage profiles={data.profiles} />;
   if (active === 'dossier') page = <DigitalDossierPage profiles={data.profiles} />;

@@ -84,14 +84,14 @@ def release_info(current_user: User = Depends(get_current_user)):
     return {
         "app_name": settings.APP_NAME,
         "app_version": settings.APP_VERSION,
-        "release_name": "Production Release 3.0",
+        "release_name": "Production Release 3.1",
         "release_stage": "PRODUCTION_READY_BASELINE",
         "environment": settings.APP_ENV,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "current_user": current_user.username,
         "modules": PRODUCTION_MODULES,
         "notes": [
-            "v3.0 là baseline sẵn sàng UAT/production pilot cho quản lý hồ sơ đề xuất cấp độ.",
+            "v3.1 bổ sung AI Classification & Level Recommendation Engine cho quản lý hồ sơ đề xuất cấp độ.",
             "Ký số hiện ở chế độ mock, cần tích hợp CA/HSM/remote signing trước khi dùng chính thức.",
             "LDAP/SSO đang ở foundation, cần cấu hình theo hạ tầng định danh thực tế.",
         ],
@@ -116,7 +116,7 @@ def release_readiness(
 ):
     counts = {table: _safe_count(db, table) for table in CORE_TABLES}
     checks = [
-        {"code": "APP_VERSION_3", "name": "Application version is 3.0 baseline", "passed": _version_tuple(settings.APP_VERSION) >= (3, 0, 0)},
+        {"code": "APP_VERSION_3", "name": "Application version is 3.1 baseline", "passed": _version_tuple(settings.APP_VERSION) >= (3, 1, 0)},
         {"code": "DB_CORE_TABLES", "name": "Core database tables are reachable", "passed": all(v is not None for v in counts.values())},
         {"code": "HAS_USERS", "name": "User and RBAC seed data exists", "passed": (counts.get("users") or 0) > 0 and (counts.get("roles") or 0) > 0},
         {"code": "HAS_SYSTEMS", "name": "Information system sample data exists", "passed": (counts.get("information_systems") or 0) > 0},
@@ -139,7 +139,7 @@ def release_readiness(
     total = len(checks)
     score = round(passed * 100 / total, 2) if total else 0
     return {
-        "release": "3.0.0",
+        "release": "3.1.0",
         "readiness_score": score,
         "status": "READY_FOR_PRODUCTION_PILOT" if score >= 85 else "READY_FOR_UAT" if score >= 75 else "NEEDS_ATTENTION",
         "passed": passed,
@@ -168,7 +168,7 @@ def production_readiness(
     fails = sum(1 for item in controls if item["status"] == "FAIL")
     warns = sum(1 for item in controls if item["status"] == "WARN")
     return {
-        "release": "3.0.0",
+        "release": "3.1.0",
         "status": "BLOCKED" if fails else "READY_WITH_WARNINGS" if warns else "READY",
         "fails": fails,
         "warnings": warns,
@@ -179,7 +179,7 @@ def production_readiness(
 @router.get("/uat-checklist")
 def uat_checklist(_=Depends(require_roles("ADMIN", "SECURITY_OFFICER", "REVIEWER"))):
     return {
-        "release": "3.0.0",
+        "release": "3.1.0",
         "checklist": [
             {"code": "UAT-001", "name": "Đăng nhập admin/attt và kiểm tra phân quyền cơ bản.", "status": "TODO"},
             {"code": "UAT-002", "name": "Tạo mới hệ thống thông tin và hồ sơ đề xuất cấp độ.", "status": "TODO"},

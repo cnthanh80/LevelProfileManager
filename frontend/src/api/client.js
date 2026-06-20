@@ -183,6 +183,12 @@ export const api = {
   executivePortfolio: () => request('/dashboard/executive/portfolio'),
   executivePriorityActions: () => request('/dashboard/executive/priority-actions'),
   executiveBoardPack: () => request('/dashboard/executive/board-pack'),
+
+  aiClassifyLevel: (payload) => request('/ai/classify-level', { method: 'POST', body: JSON.stringify(payload) }),
+  aiRecommendProfile: (profileId) => request(`/profiles/${profileId}/ai/recommend-level`, { method: 'POST' }),
+  aiRecommendationHistory: (profileId) => request(`/profiles/${profileId}/ai/recommendations`),
+  aiClassificationDashboard: () => request('/dashboard/ai-classification'),
+  aiMisclassifiedProfiles: () => request('/dashboard/ai-classification/misclassified'),
   assessmentFeedbacks: (params) => page('/assessment-feedbacks', params),
   createAssessmentFeedback: (payload) => request('/assessment-feedbacks', { method: 'POST', body: JSON.stringify(payload) }),
   updateAssessmentFeedback: (id, payload) => request(`/assessment-feedbacks/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),

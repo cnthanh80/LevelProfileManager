@@ -16,3 +16,4 @@ from app.models.profile_signature import ProfileSignature
 from app.models.risk_register import RiskRegisterItem, SlaPolicy
 
 from app.models.assessment_portal import AssessmentCase, AssessmentFeedback  # noqa
+from app.models.ai_level_recommendation import AiLevelRecommendation  # noqa

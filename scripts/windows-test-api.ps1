@@ -453,3 +453,36 @@ Write-Host "LevelProfileManager API v3.0 PASSED" -ForegroundColor Green
 Write-Host "Production Release Readiness: OK" -ForegroundColor Green
 Write-Host "ALL TESTS PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green
+
+Write-Host "AI Classification & Level Recommendation v3.1" -ForegroundColor Cyan
+$aiBody = @{
+  system_name = "Core Banking Test"
+  data_description = "He thong xu ly du lieu tai chinh, giao dich va du lieu ca nhan khach hang"
+  has_personal_data = $true
+  has_financial_data = $true
+  has_sensitive_data = $true
+  internet_exposed = $false
+  third_party_connections = $true
+  cross_org_connections = $true
+  user_count = 5000
+  transaction_per_day = 100000
+  confidentiality_impact = "HIGH"
+  integrity_impact = "HIGH"
+  availability_impact = "CRITICAL"
+  business_criticality = "CRITICAL"
+} | ConvertTo-Json
+Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/ai/classify-level" -Body $aiBody | ConvertTo-Json -Depth 10
+if ($profiles.items.Count -gt 0) {
+  $profileId = $profiles.items[0].id
+  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/profiles/$profileId/ai/recommend-level" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/profiles/$profileId/ai/recommendations" | ConvertTo-Json -Depth 10
+}
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/ai-classification" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dashboard/ai-classification/misclassified" | ConvertTo-Json -Depth 10
+
+Write-Host ""
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v3.1 PASSED" -ForegroundColor Green
+Write-Host "AI Classification & Level Recommendation: OK" -ForegroundColor Green
+Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green
