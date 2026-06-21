@@ -48,8 +48,19 @@ function page(path, params = {}) {
 
 export const api = {
   me: () => request('/auth/me'),
-  roles: () => request('/auth/roles'),
+  roles: (params) => page('/roles', params),
+  createRole: (payload) => request('/roles', { method: 'POST', body: JSON.stringify(payload) }),
+  updateRole: (id, payload) => request(`/roles/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+  deleteRole: (id) => request(`/roles/${id}`, { method: 'DELETE' }),
   identityProviderStatus: () => request('/auth/identity-provider/status'),
+
+  users: (params) => page('/users', params),
+  createUser: (payload) => request('/users', { method: 'POST', body: JSON.stringify(payload) }),
+  updateUser: (id, payload) => request(`/users/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+  deleteUser: (id) => request(`/users/${id}`, { method: 'DELETE' }),
+  lockUser: (id) => request(`/users/${id}/lock`, { method: 'POST' }),
+  unlockUser: (id) => request(`/users/${id}/unlock`, { method: 'POST' }),
+  resetUserPassword: (id, payload) => request(`/users/${id}/reset-password`, { method: 'POST', body: JSON.stringify(payload) }),
 
   identityProductionReadiness: () => request('/identity-provider/production-readiness'),
   ldapTestConnection: (payload) => request('/identity-provider/ldap/test-connection', { method: 'POST', body: JSON.stringify(payload || {}) }),
