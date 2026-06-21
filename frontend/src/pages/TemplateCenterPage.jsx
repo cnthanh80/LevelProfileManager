@@ -4,7 +4,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import PageHeader from '../components/PageHeader';
 import JsonView from '../components/JsonView';
 import StatusTag from '../components/StatusTag';
-import { api, downloadUrl } from '../api/client';
+import { api, downloadFile } from '../api/client';
 
 function pickItems(x) { return Array.isArray(x?.items) ? x.items : Array.isArray(x) ? x : []; }
 
@@ -54,6 +54,7 @@ export default function TemplateCenterPage({ profiles = [] }) {
     setPreview(res);
   };
 
+  const download = async (path, filename) => { try { const res = await downloadFile(path, filename); message.success(`Đã tải: ${res.filename}`); } catch(e) { message.error(e.message || 'Không tải được tài liệu'); } };
   return <>
     <PageHeader title="Kho biểu mẫu cơ quan" subtitle="Quản lý mẫu hồ sơ, tờ trình, công văn, quyết định và phụ lục checklist theo cơ quan/đơn vị." actions={<Button type="primary" onClick={startCreate}>Tạo biểu mẫu</Button>} />
     <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
@@ -70,7 +71,7 @@ export default function TemplateCenterPage({ profiles = [] }) {
         { title: 'Nhóm', dataIndex: 'category', width: 140, render: v => <Tag>{v}</Tag> },
         { title: 'Phiên bản', dataIndex: 'version', width: 100 },
         { title: 'Cơ quan', dataIndex: 'agency_name', width: 240 },
-        { title: 'File', dataIndex: 'template_path', width: 120, render: (v, r) => v ? <a href={downloadUrl(`/document-templates/${r.id}/download`)} target="_blank" rel="noreferrer">Tải file</a> : '—' },
+        { title: 'File', dataIndex: 'template_path', width: 120, render: (v, r) => v ? <Button size="small" onClick={() => download(`/document-templates/${r.id}/download`, `${r.code || 'template'}.docx`)}>Tải file</Button> : '—' },
         { title: 'Trạng thái', dataIndex: 'is_active', width: 120, render: v => v ? <Tag color="green">Active</Tag> : <Tag>Inactive</Tag> },
         { title: 'Mặc định', dataIndex: 'is_default', width: 120, render: v => v ? <Tag color="blue">Default</Tag> : '—' },
         { title: 'Thao tác', fixed: 'right', width: 360, render: (_, r) => <Space wrap>

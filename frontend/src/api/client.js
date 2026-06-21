@@ -1,6 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
 
 export function getToken() { return localStorage.getItem('lpm_token'); }
+export function hasToken() { return !!getToken(); }
 export function setToken(token) { localStorage.setItem('lpm_token', token); }
 export function clearToken() { localStorage.removeItem('lpm_token'); }
 
@@ -39,6 +40,53 @@ export async function login(username, password) {
 }
 
 export function downloadUrl(path) { return `${API_BASE_URL}${path}`; }
+
+
+function getFilenameFromContentDisposition(disposition) {
+  if (!disposition) return null;
+  const utf8Match = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+  if (utf8Match?.[1]) {
+    try { return decodeURIComponent(utf8Match[1].replace(/\"/g, '')); } catch { return utf8Match[1]; }
+  }
+  const match = disposition.match(/filename="?([^";]+)"?/i);
+  return match?.[1] || null;
+}
+
+export async function downloadFile(path, suggestedFilename) {
+  const token = getToken();
+  const headers = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const response = await fetch(`${API_BASE_URL}${path}`, { headers });
+  if (!response.ok) {
+    let message = `Không tải được tài liệu (HTTP ${response.status})`;
+    try {
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await response.json();
+        message = data?.detail || data?.message || message;
+      } else {
+        const text = await response.text();
+        if (text) message = text;
+      }
+    } catch {}
+    if (response.status === 401) {
+      message = 'Phiên đăng nhập đã hết hạn hoặc thiếu quyền tải tài liệu. Vui lòng đăng nhập lại.';
+      clearToken();
+    }
+    throw new Error(message);
+  }
+  const blob = await response.blob();
+  const filename = suggestedFilename || getFilenameFromContentDisposition(response.headers.get('content-disposition')) || 'download';
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+  return { filename, size: blob.size };
+}
 
 function page(path, params = {}) {
   const search = new URLSearchParams();
@@ -285,7 +333,7 @@ export const api = {
   generateEnterpriseReportSnapshot: (payload) => request('/enterprise-reporting/snapshots/generate', { method: 'POST', body: JSON.stringify(payload || {}) }),
   enterpriseReportSnapshots: (params) => page('/enterprise-reporting/snapshots', params),
   enterpriseDataWarehouseMetrics: (params) => page('/enterprise-reporting/data-warehouse/metrics', params),
-  enterprisePortfolioCsvUrl: () => downloadUrl('/enterprise-reporting/export/portfolio-csv'),
+  enterprisePortfolioCsvUrl: () => '/enterprise-reporting/export/portfolio-csv',
 
   enterpriseCenterDashboard: () => request('/enterprise-center/dashboard'),
   enterpriseSeedDefaults: () => request('/enterprise-center/seed-defaults', { method: 'POST' }),

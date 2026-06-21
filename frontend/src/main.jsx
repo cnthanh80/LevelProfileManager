@@ -62,6 +62,15 @@ function App() {
   };
 
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    const onUnauthorized = () => {
+      clearToken();
+      setUser(null);
+      setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.');
+    };
+    window.addEventListener('lpm:unauthorized', onUnauthorized);
+    return () => window.removeEventListener('lpm:unauthorized', onUnauthorized);
+  }, []);
   useEffect(() => { localStorage.setItem('lpm_active_menu', active); }, [active]);
 
   if (!getToken() || !user) return <ConfigProvider theme={{ algorithm: theme.defaultAlgorithm }}><LoginPage onLogin={load} /></ConfigProvider>;

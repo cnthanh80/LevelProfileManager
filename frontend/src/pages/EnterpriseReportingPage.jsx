@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Button, Card, Col, Row, Space, Statistic, Table, Tag, Typography } from 'antd';
-import { api } from '../api/client';
+import { Alert, Button, Card, Col, Row, Space, Statistic, Table, Tag, Typography, message } from 'antd';
+import { api, downloadFile } from '../api/client';
 
 export default function EnterpriseReportingPage() {
   const [data, setData] = useState(null);
@@ -23,6 +23,12 @@ export default function EnterpriseReportingPage() {
     finally { setLoading(false); }
   };
 
+
+  const downloadPortfolio = async () => {
+    try { const r = await downloadFile(api.enterprisePortfolioCsvUrl(), 'enterprise-portfolio.csv'); message.success(`Đã tải: ${r.filename}`); }
+    catch (e) { message.error(e.message || 'Không tải được CSV danh mục'); }
+  };
+
   const summary = data?.summary || {};
   const dist = summary.level_distribution || {};
   return <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -34,7 +40,7 @@ export default function EnterpriseReportingPage() {
       <Space>
         <Button onClick={load}>Tải lại</Button>
         <Button type="primary" onClick={generate}>Sinh snapshot</Button>
-        <Button href={api.enterprisePortfolioCsvUrl()}>Tải CSV danh mục</Button>
+        <Button onClick={downloadPortfolio}>Tải CSV danh mục</Button>
       </Space>
     </div>
     {error && <Alert type="error" showIcon message={error} />}

@@ -15,6 +15,20 @@ from app.schemas.ai_classification import AiClassificationInput
 IMPACT_POINTS = {"LOW": 5, "MEDIUM": 15, "HIGH": 25, "CRITICAL": 35}
 
 
+
+def _safe_text(value) -> str:
+    """Convert nullable values to safe strings for NLP/rule-based classification."""
+    if value is None:
+        return ""
+    return str(value).strip()
+
+
+def _safe_join(values: list) -> str:
+    """Join mixed/nullable values without raising TypeError."""
+    return " ".join(_safe_text(v) for v in values if _safe_text(v))
+
+
+
 def _contains(text: str, keywords: list[str]) -> bool:
     value = (text or "").lower()
     return any(k.lower() in value for k in keywords)
@@ -181,18 +195,38 @@ def classify_input(payload: AiClassificationInput, current_level: int | None = N
 
 def input_from_profile(db: Session, profile: LevelProfile) -> AiClassificationInput:
     system = db.get(InformationSystem, profile.information_system_id)
-    text = " ".join([
-        system.name if system else "", system.purpose if system else "", system.scope if system else "", system.main_functions if system else "",
-        system.user_groups if system else "", system.data_types if system else "", system.importance_level if system else "", system.deployment_model if system else "",
-        profile.basis_for_level or "", profile.system_scope_description or "", profile.technical_architecture or "",
-        profile.confidentiality_impact or "", profile.integrity_impact or "", profile.availability_impact or "",
+
+    text = _safe_join([
+        system.name if system else None,
+        system.purpose if system else None,
+        system.scope if system else None,
+        system.main_functions if system else None,
+        system.user_groups if system else None,
+        system.data_types if system else None,
+        system.importance_level if system else None,
+        system.deployment_model if system else None,
+        profile.profile_code,
+        profile.basis_for_level,
+        profile.system_scope_description,
+        profile.technical_architecture,
+        profile.confidentiality_impact,
+        profile.integrity_impact,
+        profile.availability_impact,
     ])
+
+    system_name = _safe_text(system.name if system else None) or _safe_text(profile.profile_code) or f"PROFILE-{profile.id}"
+    system_purpose = _safe_text(system.purpose if system else None) or _safe_text(profile.system_scope_description)
+    data_description = _safe_text(system.data_types if system else None) or _safe_text(profile.basis_for_level)
+    user_groups = _safe_text(system.user_groups if system else None) or None
+    deployment_model = _safe_text(system.deployment_model if system else None) or None
+    importance_level = _safe_text(system.importance_level if system else None).upper()
+
     return AiClassificationInput(
-        system_name=system.name if system else profile.profile_code,
-        system_purpose=system.purpose if system else profile.system_scope_description,
-        data_description=system.data_types if system else profile.basis_for_level,
-        user_groups=system.user_groups if system else None,
-        deployment_model=system.deployment_model if system else None,
+        system_name=system_name,
+        system_purpose=system_purpose,
+        data_description=data_description,
+        user_groups=user_groups,
+        deployment_model=deployment_model,
         has_personal_data=_contains(text, ["cá nhân", "ca nhan", "personal", "khách hàng", "khach hang", "công dân", "cong dan"]),
         has_financial_data=_contains(text, ["tài chính", "tai chinh", "giao dịch", "giao dich", "ngân hàng", "ngan hang", "core", "kế toán", "ke toan"]),
         has_sensitive_data=_contains(text, ["nhạy cảm", "nhay cam", "sensitive", "mật", "mat", "nội bộ", "noi bo"]),
@@ -205,7 +239,7 @@ def input_from_profile(db: Session, profile: LevelProfile) -> AiClassificationIn
         confidentiality_impact=_map_impact(profile.confidentiality_impact),
         integrity_impact=_map_impact(profile.integrity_impact),
         availability_impact=_map_impact(profile.availability_impact),
-        business_criticality="HIGH" if system and str(system.importance_level or "").upper() in {"HIGH", "CRITICAL", "CAO", "TRỌNG YẾU"} else "MEDIUM",
+        business_criticality="HIGH" if importance_level in {"HIGH", "CRITICAL", "CAO", "TRỌNG YẾU"} else "MEDIUM",
     )
 
 

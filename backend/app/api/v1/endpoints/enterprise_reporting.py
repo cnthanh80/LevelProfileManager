@@ -30,6 +30,12 @@ def dashboard(db: Session = Depends(get_db), current_user: User = Depends(get_cu
     return reporting_dashboard(db)
 
 
+# Backward-compatible alias used by older frontend/test scripts.
+@router.get("/enterprise-reporting/dashboard", response_model=EnterpriseReportingDashboard)
+def dashboard_alias(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return reporting_dashboard(db)
+
+
 @router.get("/enterprise-reporting/summary", response_model=EnterpriseReportingSummary)
 def summary(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return calculate_enterprise_summary(db)
