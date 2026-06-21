@@ -170,6 +170,32 @@ def create_application(payload: CmdbApplicationCreate, db: Session = Depends(get
     return item
 
 
+@router.put("/cmdb-applications/{application_id}", response_model=CmdbApplicationRead)
+def update_application(application_id: int, payload: CmdbApplicationUpdate, db: Session = Depends(get_db), current_user: User = Depends(require_roles("ADMIN", "SECURITY_OFFICER"))):
+    item = db.get(CmdbApplication, application_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Application not found")
+    data = payload.model_dump(exclude_unset=True)
+    for key in ["app_type", "status"]:
+        if isinstance(data.get(key), str):
+            data[key] = data[key].upper()
+    for k, v in data.items():
+        setattr(item, k, v)
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@router.delete("/cmdb-applications/{application_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_application(application_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_roles("ADMIN", "SECURITY_OFFICER"))):
+    item = db.get(CmdbApplication, application_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Application not found")
+    db.delete(item)
+    db.commit()
+    return None
+
+
 @router.get("/cmdb-databases", response_model=Page[CmdbDatabaseRead])
 def list_databases(
     information_system_id: int | None = None,
@@ -198,6 +224,32 @@ def create_database(payload: CmdbDatabaseCreate, db: Session = Depends(get_db), 
     return item
 
 
+@router.put("/cmdb-databases/{database_id}", response_model=CmdbDatabaseRead)
+def update_database(database_id: int, payload: CmdbDatabaseUpdate, db: Session = Depends(get_db), current_user: User = Depends(require_roles("ADMIN", "SECURITY_OFFICER"))):
+    item = db.get(CmdbDatabase, database_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Database not found")
+    data = payload.model_dump(exclude_unset=True)
+    for key in ["db_type", "data_classification", "status"]:
+        if isinstance(data.get(key), str):
+            data[key] = data[key].upper()
+    for k, v in data.items():
+        setattr(item, k, v)
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@router.delete("/cmdb-databases/{database_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_database(database_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_roles("ADMIN", "SECURITY_OFFICER"))):
+    item = db.get(CmdbDatabase, database_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Database not found")
+    db.delete(item)
+    db.commit()
+    return None
+
+
 @router.get("/cmdb-network-devices", response_model=Page[CmdbNetworkDeviceRead])
 def list_network_devices(
     information_system_id: int | None = None,
@@ -224,6 +276,32 @@ def create_network_device(payload: CmdbNetworkDeviceCreate, db: Session = Depend
     db.commit()
     db.refresh(item)
     return item
+
+
+@router.put("/cmdb-network-devices/{device_id}", response_model=CmdbNetworkDeviceRead)
+def update_network_device(device_id: int, payload: CmdbNetworkDeviceUpdate, db: Session = Depends(get_db), current_user: User = Depends(require_roles("ADMIN", "SECURITY_OFFICER"))):
+    item = db.get(CmdbNetworkDevice, device_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Network device not found")
+    data = payload.model_dump(exclude_unset=True)
+    for key in ["device_type", "zone", "status"]:
+        if isinstance(data.get(key), str):
+            data[key] = data[key].upper()
+    for k, v in data.items():
+        setattr(item, k, v)
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@router.delete("/cmdb-network-devices/{device_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_network_device(device_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_roles("ADMIN", "SECURITY_OFFICER"))):
+    item = db.get(CmdbNetworkDevice, device_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Network device not found")
+    db.delete(item)
+    db.commit()
+    return None
 
 
 @router.post("/cmdb-relationships", response_model=CmdbRelationshipRead, status_code=status.HTTP_201_CREATED)
