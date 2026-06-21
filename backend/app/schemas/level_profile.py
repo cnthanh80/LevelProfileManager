@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict
 
 
@@ -14,6 +15,9 @@ class LevelProfileBase(BaseModel):
     availability_impact: str | None = None
     created_by: int | None = None
     locked_by: int | None = None
+    is_deleted: bool = False
+    deleted_at: datetime | None = None
+    deleted_by: int | None = None
 
 
 class LevelProfileCreate(LevelProfileBase):
@@ -33,6 +37,9 @@ class LevelProfileUpdate(BaseModel):
     availability_impact: str | None = None
     created_by: int | None = None
     locked_by: int | None = None
+    is_deleted: bool = False
+    deleted_at: datetime | None = None
+    deleted_by: int | None = None
 
 
 class LevelProfileRead(LevelProfileBase):

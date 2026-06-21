@@ -100,6 +100,7 @@ export const api = {
   createProfile: (payload) => request('/level-profiles', { method: 'POST', body: JSON.stringify(payload) }),
   updateProfile: (id, payload) => request(`/level-profiles/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
   deleteProfile: (id) => request(`/level-profiles/${id}`, { method: 'DELETE' }),
+  restoreProfile: (id) => request(`/level-profiles/${id}/restore`, { method: 'POST' }),
 
   securityRequirements: (params) => page('/security-requirements', params),
   requirementsByLevel: (level) => request(`/security-requirements/by-level/${level}`),

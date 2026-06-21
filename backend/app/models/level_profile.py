@@ -1,4 +1,5 @@
-from sqlalchemy import ForeignKey, Integer, String, Text
+from datetime import datetime
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base, TimestampMixin
 
@@ -19,3 +20,6 @@ class LevelProfile(Base, TimestampMixin):
     availability_impact: Mapped[str | None] = mapped_column(Text)
     created_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     locked_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    deleted_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))

@@ -10,7 +10,7 @@ try {
 }
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v4.2.1..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v4.2.3..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -47,6 +47,26 @@ Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/auth/me" | ConvertTo-Json
 Write-Host "Profiles" -ForegroundColor Cyan
 $profiles = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/level-profiles?limit=10"
 $profiles | ConvertTo-Json -Depth 5
+
+Write-Host "Soft Delete Level Profile" -ForegroundColor Cyan
+$systemsForSoftDelete = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/information-systems?limit=1"
+if ($systemsForSoftDelete.items.Count -gt 0) {
+  $softDeleteCode = "UAT-SOFTDELETE-" + (Get-Date -Format "yyyyMMddHHmmss")
+  $softProfile = Invoke-LpmJson -Method "POST" -Headers $headers -Uri "$BaseUrl/api/v1/level-profiles" -Body @{
+    profile_code = $softDeleteCode
+    information_system_id = $systemsForSoftDelete.items[0].id
+    proposed_level = 2
+    status = "DRAFT"
+    basis_for_level = "UAT soft delete test"
+  }
+  Invoke-RestMethod -Method Delete -Headers $headers "$BaseUrl/api/v1/level-profiles/$($softProfile.id)" | Out-Null
+  $archivedProfiles = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/level-profiles?include_deleted=true&limit=200"
+  $archived = $archivedProfiles.items | Where-Object { $_.id -eq $softProfile.id }
+  if (-not $archived -or -not $archived.is_deleted -or $archived.status -ne "ARCHIVED") {
+    throw "Soft delete level profile test failed"
+  }
+  Invoke-RestMethod -Method Post -Headers $headers "$BaseUrl/api/v1/level-profiles/$($softProfile.id)/restore" | ConvertTo-Json -Depth 5
+}
 
 if ($profiles.items.Count -gt 0) {
   $profileId = $profiles.items[0].id
