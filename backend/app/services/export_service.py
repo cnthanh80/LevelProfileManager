@@ -12,6 +12,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib import colors
+from app.services.pdf_font import apply_unicode_styles, register_unicode_fonts
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -168,30 +169,32 @@ def generate_pdf(db: Session, profile_id: int, document_type: str, generated_by:
     output_path = EXPORT_ROOT / stored_filename
 
     styles = getSampleStyleSheet()
+    regular_font, bold_font = apply_unicode_styles(styles)
     story = []
     story.append(Paragraph(title.upper(), styles["Title"]))
-    story.append(Paragraph(f"Ma ho so: {profile.profile_code}", styles["Normal"]))
-    story.append(Paragraph(f"Ngay xuat: {datetime.now().strftime('%d/%m/%Y %H:%M')}", styles["Normal"]))
+    story.append(Paragraph(f"Mã hồ sơ: {profile.profile_code}", styles["Normal"]))
+    story.append(Paragraph(f"Ngày xuất: {datetime.now().strftime('%d/%m/%Y %H:%M')}", styles["Normal"]))
     story.append(Spacer(1, 12))
-    story.append(Paragraph("1. Thong tin he thong thong tin", styles["Heading2"]))
+    story.append(Paragraph("1. Thông tin hệ thống thông tin", styles["Heading2"]))
     profile_table = Table([
-        ["Ten he thong", _safe(system.name)],
-        ["Ma he thong", _safe(system.code)],
-        ["Cap do de xuat", str(profile.proposed_level)],
-        ["Trang thai", _safe(profile.status)],
-        ["Mo hinh trien khai", _safe(system.deployment_model)],
-        ["Moi truong", _safe(system.environment)],
-        ["So tai lieu minh chung", str(evidence_count)],
+        ["Tên hệ thống", _safe(system.name)],
+        ["Mã hệ thống", _safe(system.code)],
+        ["Cấp độ đề xuất", str(profile.proposed_level)],
+        ["Trạng thái", _safe(profile.status)],
+        ["Mô hình triển khai", _safe(system.deployment_model)],
+        ["Môi trường", _safe(system.environment)],
+        ["Số tài liệu minh chứng", str(evidence_count)],
     ], colWidths=[140, 350])
     profile_table.setStyle(TableStyle([
         ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
         ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("FONTNAME", (0, 0), (-1, -1), regular_font),
     ]))
     story.append(profile_table)
     story.append(Spacer(1, 12))
-    story.append(Paragraph("2. Checklist tom tat", styles["Heading2"]))
-    data = [["Ma", "Nhom", "Yeu cau", "Trang thai", "Minh chung"]]
+    story.append(Paragraph("2. Checklist tóm tắt", styles["Heading2"]))
+    data = [["Mã", "Nhóm", "Yêu cầu", "Trạng thái", "Minh chứng"]]
     for answer, req in checklist_rows[:80]:
         data.append([_safe(req.code), _safe(req.group_name), _safe(req.title)[:80], _safe(answer.status), str(answer.evidence_count or 0)])
     table = Table(data, colWidths=[55, 80, 230, 80, 60])
@@ -199,11 +202,13 @@ def generate_pdf(db: Session, profile_id: int, document_type: str, generated_by:
         ("GRID", (0, 0), (-1, -1), 0.25, colors.grey),
         ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("FONTNAME", (0, 0), (-1, -1), regular_font),
         ("FONTSIZE", (0, 0), (-1, -1), 8),
+        ("FONTNAME", (0, 0), (-1, -1), regular_font),
     ]))
     story.append(table)
     story.append(Spacer(1, 12))
-    story.append(Paragraph("Ghi chu: Ban PDF MVP dung de kiem thu luong xuat tai lieu. Ban production se chuyen doi tu template DOCX.", styles["Normal"]))
+    story.append(Paragraph("Ghi chú: Bản PDF được sinh tự động từ hệ thống Level Profile Manager.", styles["Normal"]))
 
     pdf = SimpleDocTemplate(str(output_path), pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
     pdf.build(story)

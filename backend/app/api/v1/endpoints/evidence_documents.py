@@ -16,6 +16,32 @@ from app.services.evidence_service import delete_evidence, save_evidence_file, v
 router = APIRouter()
 
 
+def _deduplicate_evidence(items: list[EvidenceDocument]) -> list[EvidenceDocument]:
+    """Keep the newest row for identical evidence records.
+
+    UAT scripts may upload the same sample evidence many times. The database
+    can still keep historical rows, but list screens should not display the
+    exact same file repeatedly.
+    """
+    seen: set[tuple] = set()
+    result: list[EvidenceDocument] = []
+    for item in items:
+        key = (
+            item.profile_id,
+            item.checklist_answer_id,
+            item.document_type,
+            item.title,
+            item.original_filename,
+            item.checksum_sha256,
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(item)
+    return result
+
+
+
 @router.post("/evidence-documents", response_model=EvidenceDocumentUploadResponse, status_code=status.HTTP_201_CREATED)
 def upload_evidence_document(
     profile_id: int = Form(...),
@@ -65,8 +91,11 @@ def list_evidence_documents(
     if filters:
         stmt = stmt.where(*filters)
         count_stmt = count_stmt.where(*filters)
-    total = db.scalar(count_stmt) or 0
-    items = db.scalars(stmt.order_by(EvidenceDocument.created_at.desc(), EvidenceDocument.id.desc()).limit(limit).offset(offset)).all()
+    # Fetch then de-duplicate exact duplicate evidence rows for UAT-friendly display.
+    all_items = db.scalars(stmt.order_by(EvidenceDocument.created_at.desc(), EvidenceDocument.id.desc())).all()
+    unique_items = _deduplicate_evidence(all_items)
+    total = len(unique_items)
+    items = unique_items[offset: offset + limit]
     return Page[EvidenceDocumentRead](items=items, total=total, limit=limit, offset=offset)
 
 
@@ -140,9 +169,10 @@ def list_profile_evidence_documents(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return db.scalars(
-        select(EvidenceDocument).where(EvidenceDocument.profile_id == profile_id).order_by(EvidenceDocument.created_at.desc())
+    items = db.scalars(
+        select(EvidenceDocument).where(EvidenceDocument.profile_id == profile_id).order_by(EvidenceDocument.created_at.desc(), EvidenceDocument.id.desc())
     ).all()
+    return _deduplicate_evidence(items)
 
 
 @router.get("/checklist-answers/{answer_id}/evidence-documents", response_model=list[EvidenceDocumentRead])
@@ -151,6 +181,7 @@ def list_answer_evidence_documents(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return db.scalars(
-        select(EvidenceDocument).where(EvidenceDocument.checklist_answer_id == answer_id).order_by(EvidenceDocument.created_at.desc())
+    items = db.scalars(
+        select(EvidenceDocument).where(EvidenceDocument.checklist_answer_id == answer_id).order_by(EvidenceDocument.created_at.desc(), EvidenceDocument.id.desc())
     ).all()
+    return _deduplicate_evidence(items)

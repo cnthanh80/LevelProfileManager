@@ -90,6 +90,25 @@ def save_evidence_file(
             sha256.update(chunk)
             out.write(chunk)
 
+    # Avoid creating duplicate rows when the same evidence file is uploaded
+    # repeatedly during UAT/test runs. If the same profile + checklist answer +
+    # document type + original filename + checksum already exists, return the
+    # latest existing record and remove the newly written duplicate physical file.
+    duplicate = db.scalar(
+        select(EvidenceDocument)
+        .where(
+            EvidenceDocument.profile_id == profile_id,
+            EvidenceDocument.checklist_answer_id == checklist_answer_id,
+            EvidenceDocument.document_type == document_type,
+            EvidenceDocument.original_filename == original_name,
+            EvidenceDocument.checksum_sha256 == sha256.hexdigest(),
+        )
+        .order_by(EvidenceDocument.id.desc())
+    )
+    if duplicate:
+        storage_path.unlink(missing_ok=True)
+        return duplicate
+
     existing_versions = db.scalar(
         select(func.count(EvidenceDocument.id)).where(
             EvidenceDocument.profile_id == profile_id,

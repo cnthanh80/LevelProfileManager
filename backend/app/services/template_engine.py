@@ -12,6 +12,7 @@ from fastapi import HTTPException
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
+from app.services.pdf_font import apply_unicode_styles
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -311,13 +312,14 @@ def generate_government_document(
         content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     else:
         styles = getSampleStyleSheet()
-        story = [Paragraph(title.upper(), styles["Title"]), Paragraph(f"Ho so: {profile.profile_code}", styles["Normal"]), Spacer(1, 12)]
-        data = [["Thong tin", "Noi dung"], ["Ten he thong", system.name], ["Ma he thong", system.code], ["Cap do", str(profile.proposed_level)], ["Trang thai", profile.status], ["Minh chung", str(_evidence_count(db, profile.id))]]
+        regular_font, bold_font = apply_unicode_styles(styles)
+        story = [Paragraph(title.upper(), styles["Title"]), Paragraph(f"Hồ sơ: {profile.profile_code}", styles["Normal"]), Spacer(1, 12)]
+        data = [["Thông tin", "Nội dung"], ["Tên hệ thống", _safe(system.name)], ["Mã hệ thống", _safe(system.code)], ["Cấp độ", str(profile.proposed_level)], ["Trạng thái", _safe(profile.status)], ["Minh chứng", str(_evidence_count(db, profile.id))]]
         table = Table(data, colWidths=[150, 340])
-        table.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.grey), ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey), ("VALIGN", (0, 0), (-1, -1), "TOP")]))
+        table.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.grey), ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey), ("VALIGN", (0, 0), (-1, -1), "TOP"), ("FONTNAME", (0, 0), (-1, -1), regular_font)]))
         story.append(table)
         story.append(Spacer(1, 12))
-        story.append(Paragraph("Ban PDF duoc sinh tu Government Document Generator v1.6.", styles["Normal"]))
+        story.append(Paragraph("Bản PDF được sinh từ Government Document Generator v1.6.", styles["Normal"]))
         SimpleDocTemplate(str(output_path), pagesize=A4).build(story)
         content_type = "application/pdf"
 
