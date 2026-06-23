@@ -28,6 +28,7 @@ from app.schemas.document_template import (
 )
 from app.schemas.exported_document import ExportedDocumentRead
 from app.services.template_engine import GOVERNMENT_DOCUMENT_TYPES, generate_government_document, seed_default_templates
+from app.services.dynamic_template_service import build_template_context, extract_placeholders_from_docx, variable_registry
 
 router = APIRouter()
 TEMPLATE_ROOT = Path("/app/storage/templates")
@@ -72,21 +73,7 @@ def template_center_summary(
 
 @router.get("/document-templates/variables")
 def list_template_variables(current_user: User = Depends(get_current_user)):
-    return {
-        "variables": [
-            {"key": "agency_name", "description": "Tên cơ quan, tổ chức", "sample": "NGÂN HÀNG CHÍNH SÁCH XÃ HỘI"},
-            {"key": "place_name", "description": "Địa danh ban hành văn bản", "sample": "Hà Nội"},
-            {"key": "document_date", "description": "Ngày sinh văn bản", "sample": "20/06/2026"},
-            {"key": "profile.profile_code", "description": "Mã hồ sơ đề xuất cấp độ", "sample": "HS-CD-CORE-2026"},
-            {"key": "profile.proposed_level", "description": "Cấp độ đề xuất", "sample": "3"},
-            {"key": "profile.status", "description": "Trạng thái hồ sơ", "sample": "INTERNALLY_APPROVED"},
-            {"key": "system.code", "description": "Mã hệ thống thông tin", "sample": "CORE"},
-            {"key": "system.name", "description": "Tên hệ thống thông tin", "sample": "Core Banking"},
-            {"key": "system.deployment_model", "description": "Mô hình triển khai", "sample": "on_premise"},
-            {"key": "signer_title", "description": "Chức danh người ký", "sample": "GIÁM ĐỐC"},
-            {"key": "signer_name", "description": "Họ tên người ký", "sample": "Nguyễn Văn A"},
-        ]
-    }
+    return variable_registry()
 
 
 @router.post("/document-templates/preview-context")
@@ -98,34 +85,28 @@ def preview_template_context(
     profile = db.get(LevelProfile, payload.profile_id)
     if not profile:
         raise HTTPException(status_code=404, detail="Level profile not found")
-    system = db.get(InformationSystem, profile.information_system_id)
     template = None
+    placeholders: list[str] = []
     if payload.template_code:
         template = db.scalar(select(DocumentTemplate).where(DocumentTemplate.code == payload.template_code))
+        if template and template.template_path and Path(template.template_path).exists() and template.file_format.lower() == "docx":
+            placeholders = extract_placeholders_from_docx(template.template_path)
+    context = build_template_context(
+        db,
+        payload.profile_id,
+        agency_name=template.agency_name if template else None,
+    )
     return {
         "template": {
             "code": template.code if template else payload.template_code,
             "document_type": template.document_type if template else payload.document_type,
             "agency_name": template.agency_name if template else None,
+            "file_format": template.file_format if template else None,
+            "has_uploaded_file": bool(template and template.template_path),
+            "placeholders_in_file": placeholders,
         },
-        "profile": {
-            "id": profile.id,
-            "profile_code": profile.profile_code,
-            "name": profile.profile_code,
-            "proposed_level": profile.proposed_level,
-            "status": profile.status,
-        },
-        "system": {
-            "id": system.id if system else None,
-            "code": system.code if system else None,
-            "name": system.name if system else None,
-            "deployment_model": system.deployment_model if system else None,
-            "environment": system.environment if system else None,
-        },
-        "document": {
-            "document_type": payload.document_type,
-            "document_date": datetime.utcnow().strftime("%d/%m/%Y"),
-        },
+        "context": context,
+        "flat_context": {k: v for k, v in context.items() if not isinstance(v, (dict, list))},
     }
 
 
@@ -235,6 +216,12 @@ def upload_template_file(
     item.checksum_sha256 = _sha256(stored)
     item.uploaded_by = current_user.id
     item.uploaded_at = datetime.utcnow()
+    if suffix == ".docx":
+        try:
+            variables = extract_placeholders_from_docx(stored)
+            item.variable_schema = "\n".join(f"{{{{ {v} }}}}" for v in variables) if variables else item.variable_schema
+        except Exception:
+            pass
     db.commit()
     db.refresh(item)
     return item

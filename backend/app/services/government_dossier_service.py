@@ -23,6 +23,7 @@ from app.models.level_profile import LevelProfile
 from app.models.organization import Organization
 from app.models.profile_requirement_answer import ProfileRequirementAnswer
 from app.models.security_requirement import SecurityRequirement
+from app.services.dynamic_template_service import build_template_context, get_active_template, render_docx_template
 
 DOSSIER_ROOT = Path("/app/storage/dossiers")
 
@@ -39,6 +40,18 @@ DOC_TYPES = [
     ("QUYET_DINH", "04-QuyetDinh.docx", "Quyết định phê duyệt cấp độ", 40),
     ("CHECKLIST", "05-Checklist.xlsx", "Phụ lục checklist đáp ứng yêu cầu ATTT", 50),
 ]
+
+
+# Mapping file_type -> active DocumentTemplate.document_type is handled by dynamic_template_service.
+# If an active uploaded DOCX template exists, it is used. Otherwise the legacy
+# hard-coded generator below is used as a safe fallback.
+
+def _try_render_active_docx_template(db: Session, file_type: str, output_path: Path, ctx: dict) -> bool:
+    template = get_active_template(db, file_type)
+    if not template:
+        return False
+    render_docx_template(template.template_path, output_path, ctx.get("template_context") or {})
+    return True
 
 
 def _safe(value: object, default: str = "") -> str:
@@ -135,6 +148,7 @@ def _context(db: Session, profile_id: int) -> dict:
     na = sum(1 for a in answers if _safe(a.status).upper() == "NOT_APPLICABLE")
     total_effective = max(1, len(answers) - na)
     compliance_rate = round(compliant * 100 / total_effective, 2)
+    template_context = build_template_context(db, profile_id)
     return {
         "profile": profile,
         "system": system,
@@ -145,6 +159,7 @@ def _context(db: Session, profile_id: int) -> dict:
         "owner_org": _org_name(db, system.owner_org_id if system else None),
         "operator_org": _org_name(db, system.operator_org_id if system else None),
         "generated_at": datetime.now(),
+        "template_context": template_context,
     }
 
 
@@ -343,7 +358,9 @@ def generate_government_dossier(db: Session, profile_id: int, generated_by: int 
     generated_files: list[tuple[str, str, str, Path, str, int]] = []
     for file_type, filename, title, sort_order in DOC_TYPES:
         path = root / filename
-        if file_type == "TO_TRINH":
+        if file_type in {"TO_TRINH", "HO_SO_CAP_DO", "XIN_Y_KIEN", "QUYET_DINH"} and _try_render_active_docx_template(db, file_type, path, ctx):
+            content_type = CONTENT_TYPES["docx"]
+        elif file_type == "TO_TRINH":
             _make_to_trinh(path, ctx)
             content_type = CONTENT_TYPES["docx"]
         elif file_type == "HO_SO_CAP_DO":

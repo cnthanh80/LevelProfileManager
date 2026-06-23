@@ -36,3 +36,27 @@ desktop.ini
 
 # Docker
 postgres_data/
+
+# Runtime generated files
+backend/storage/dossiers/
+backend/storage/exports/
+backend/storage/signed/
+backend/storage/signed-dossiers/
+
+# Uploaded templates
+backend/storage/templates/*.txt
+backend/storage/templates/*.docx
+backend/storage/templates/*.pdf
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+dist/
+build/

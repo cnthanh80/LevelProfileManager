@@ -25,6 +25,7 @@ from app.models.level_profile import LevelProfile
 from app.models.profile_requirement_answer import ProfileRequirementAnswer
 from app.models.security_requirement import SecurityRequirement
 
+
 EXPORT_ROOT = Path("/app/storage/exports")
 
 GOVERNMENT_DOCUMENT_TYPES = {
@@ -289,26 +290,42 @@ def generate_government_document(
     output_path = EXPORT_ROOT / stored_filename
 
     if file_format == "docx":
-        doc = Document()
-        _set_doc_style(doc)
-        _add_formal_header(doc, agency_name)
-        _add_right_italic(doc, f"{place_name or 'Hà Nội'}, ngày {datetime.now().day:02d} tháng {datetime.now().month:02d} năm {datetime.now().year}")
-        _add_center(doc, title.upper(), bold=True, size=14)
-        _add_center(doc, f"Hồ sơ: {profile.profile_code}", bold=False, size=12)
-        if document_type == "PROFILE_EXPLANATION":
-            _build_profile_explanation(doc, db, profile, system)
-        elif document_type == "CHECKLIST_APPENDIX":
-            _build_checklist_appendix(doc, db, profile)
-        elif document_type == "APPROVAL_SUBMISSION":
-            _build_submission(doc, profile, system)
-        elif document_type == "CONSULTATION_REQUEST":
-            _build_consultation_request(doc, profile, system)
-        elif document_type == "APPROVAL_DECISION":
-            _build_approval_decision(doc, profile, system)
+        active_template = None
+        if template_code:
+            active_template = template if template.template_path and template.file_format.lower() == "docx" else None
         else:
-            _build_profile_explanation(doc, db, profile, system)
-        _add_signature_block(doc, signer_title, signer_name)
-        doc.save(output_path)
+            active_template = get_active_template(db, document_type)
+        if active_template and active_template.template_path:
+            context = build_template_context(
+                db,
+                profile_id,
+                agency_name=agency_name or active_template.agency_name,
+                place_name=place_name or "Hà Nội",
+                signer_title=signer_title or "THỦ TRƯỞNG ĐƠN VỊ",
+                signer_name=signer_name,
+            )
+            render_docx_template(active_template.template_path, output_path, context)
+        else:
+            doc = Document()
+            _set_doc_style(doc)
+            _add_formal_header(doc, agency_name)
+            _add_right_italic(doc, f"{place_name or 'Hà Nội'}, ngày {datetime.now().day:02d} tháng {datetime.now().month:02d} năm {datetime.now().year}")
+            _add_center(doc, title.upper(), bold=True, size=14)
+            _add_center(doc, f"Hồ sơ: {profile.profile_code}", bold=False, size=12)
+            if document_type == "PROFILE_EXPLANATION":
+                _build_profile_explanation(doc, db, profile, system)
+            elif document_type == "CHECKLIST_APPENDIX":
+                _build_checklist_appendix(doc, db, profile)
+            elif document_type == "APPROVAL_SUBMISSION":
+                _build_submission(doc, profile, system)
+            elif document_type == "CONSULTATION_REQUEST":
+                _build_consultation_request(doc, profile, system)
+            elif document_type == "APPROVAL_DECISION":
+                _build_approval_decision(doc, profile, system)
+            else:
+                _build_profile_explanation(doc, db, profile, system)
+            _add_signature_block(doc, signer_title, signer_name)
+            doc.save(output_path)
         content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     else:
         styles = getSampleStyleSheet()
@@ -340,3 +357,14 @@ def generate_government_document(
     db.commit()
     db.refresh(item)
     return item
+
+def get_active_template(db, document_type: str):
+    return (
+        db.query(DocumentTemplate)
+        .filter(
+            DocumentTemplate.document_type == document_type,
+            DocumentTemplate.is_active == True
+        )
+        .order_by(DocumentTemplate.id.desc())
+        .first()
+    )

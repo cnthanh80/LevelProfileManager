@@ -66,7 +66,7 @@ export default function GovernmentDossierPage({ profiles }) {
   return <>
     <PageHeader
       title="Government Dossier Pack"
-      subtitle="Sinh bộ hồ sơ cấp độ đầy đủ: Tờ trình, Hồ sơ đề xuất cấp độ, Văn bản xin ý kiến, Quyết định, Checklist và thư mục minh chứng."
+      subtitle="Sinh bộ hồ sơ cấp độ theo mẫu DOCX đang kích hoạt trong Quản lý mẫu biểu; nếu chưa có mẫu active, hệ thống dùng mẫu mặc định."
       actions={<Space>
         <Select style={{ width: 280 }} value={profileId} onChange={setProfileId} options={(profiles || []).map(p => ({ value: p.id, label: `${p.profile_code} · Level ${p.proposed_level || ''}` }))} />
         <Checkbox checked={includeEvidence} onChange={e => setIncludeEvidence(e.target.checked)}>Kèm minh chứng</Checkbox>
@@ -79,7 +79,7 @@ export default function GovernmentDossierPage({ profiles }) {
         <Descriptions.Item label="Tổng bộ hồ sơ">{summary.total_dossiers || 0}</Descriptions.Item>
         <Descriptions.Item label="Tổng file sinh ra">{summary.generated_files || 0}</Descriptions.Item>
         <Descriptions.Item label="Dung lượng ZIP">{fmtSize(summary.total_package_size)}</Descriptions.Item>
-        <Descriptions.Item label="Phiên bản">Phase 42.0 / v4.2</Descriptions.Item>
+        <Descriptions.Item label="Phiên bản">Phase 42.1 / v4.3</Descriptions.Item>
       </Descriptions>
     </Card>
     <Card title="Danh sách bộ hồ sơ đã sinh">

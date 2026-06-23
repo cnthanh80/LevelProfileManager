@@ -762,3 +762,25 @@ Write-Host "LevelProfileManager API v4.2 PASSED" -ForegroundColor Green
 Write-Host "Government Dossier Pack: OK" -ForegroundColor Green
 Write-Host "ALL TESTS PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green
+
+
+Write-Host "Dynamic Official Template Management v4.3 / Phase 42.1" -ForegroundColor Cyan
+try {
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/document-templates/variables" | ConvertTo-Json -Depth 10
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/document-templates?active_only=false&limit=20" | ConvertTo-Json -Depth 10
+  if ($profiles.items.Count -gt 0) {
+    $profileId = $profiles.items[0].id
+    $previewBody = @{ profile_id = $profileId; document_type = "APPROVAL_SUBMISSION" } | ConvertTo-Json
+    Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/document-templates/preview-context" -Body $previewBody | ConvertTo-Json -Depth 10
+  }
+  Write-Host "Dynamic Official Template Management v4.3 OK" -ForegroundColor Green
+} catch {
+  Write-Host "Dynamic Official Template Management v4.3 test failed: $($_.Exception.Message)" -ForegroundColor Red
+  throw
+}
+
+Write-Host "======================================" -ForegroundColor Green
+Write-Host "LevelProfileManager API v4.3 PASSED" -ForegroundColor Green
+Write-Host "Dynamic Official Template Management: OK" -ForegroundColor Green
+Write-Host "ALL TESTS PASSED" -ForegroundColor Green
+Write-Host "======================================" -ForegroundColor Green

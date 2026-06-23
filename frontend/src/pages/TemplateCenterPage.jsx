@@ -4,7 +4,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import PageHeader from '../components/PageHeader';
 import JsonView from '../components/JsonView';
 import StatusTag from '../components/StatusTag';
-import { api, downloadUrl } from '../api/client';
+import { api, downloadFile } from '../api/client';
 
 function pickItems(x) { return Array.isArray(x?.items) ? x.items : Array.isArray(x) ? x : []; }
 
@@ -31,7 +31,7 @@ export default function TemplateCenterPage({ profiles = [] }) {
 
   const startCreate = () => {
     setEditing(null); form.resetFields();
-    form.setFieldsValue({ document_type: 'PROFILE_EXPLANATION', category: 'GOVERNMENT', version: '1.0', file_format: 'docx', is_active: true, is_default: false, sort_order: 100 });
+    form.setFieldsValue({ document_type: 'APPROVAL_SUBMISSION', category: 'GOVERNMENT', version: '1.0', file_format: 'docx', is_active: true, is_default: false, sort_order: 100 });
     setOpen(true);
   };
   const startEdit = (r) => { setEditing(r); form.setFieldsValue(r); setOpen(true); };
@@ -55,13 +55,16 @@ export default function TemplateCenterPage({ profiles = [] }) {
   };
 
   return <>
-    <PageHeader title="Kho biểu mẫu cơ quan" subtitle="Quản lý mẫu hồ sơ, tờ trình, công văn, quyết định và phụ lục checklist theo cơ quan/đơn vị." actions={<Button type="primary" onClick={startCreate}>Tạo biểu mẫu</Button>} />
+    <PageHeader title="Quản lý mẫu biểu động" subtitle="Upload mẫu DOCX chính thức của cơ quan, gắn biến {{ system_name }}, {{ profile_code }}, kích hoạt và sinh hồ sơ theo mẫu đang hiệu lực." actions={<Button type="primary" onClick={startCreate}>Tạo biểu mẫu</Button>} />
     <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
       <Col xs={24} md={6}><Card><Statistic title="Tổng biểu mẫu" value={summary.total_templates || 0} /></Card></Col>
       <Col xs={24} md={6}><Card><Statistic title="Đang kích hoạt" value={summary.active_templates || 0} /></Card></Col>
       <Col xs={24} md={6}><Card><Statistic title="Có file upload" value={summary.uploaded_templates || 0} /></Card></Col>
       <Col xs={24} md={6}><Card><Statistic title="Mẫu mặc định" value={summary.default_templates || 0} /></Card></Col>
     </Row>
+    <Card style={{ marginBottom: 16 }} title="Hướng dẫn dùng mẫu DOCX chính thức">
+      <div>Trong file Word mẫu, đặt biến theo cú pháp <b>{'{{ system_name }}'}</b>, <b>{'{{ profile_code }}'}</b>, <b>{'{{ proposed_level }}'}</b>, <b>{'{{ owner_organization }}'}</b>. Upload file DOCX, sau đó bấm <b>Default</b> để áp dụng khi sinh Government Dossier Pack.</div>
+    </Card>
     <Card title="Danh sách biểu mẫu">
       <Table rowKey="id" dataSource={items} scroll={{ x: 1300 }} columns={[
         { title: 'Mã', dataIndex: 'code', fixed: 'left', width: 220 },
@@ -70,7 +73,7 @@ export default function TemplateCenterPage({ profiles = [] }) {
         { title: 'Nhóm', dataIndex: 'category', width: 140, render: v => <Tag>{v}</Tag> },
         { title: 'Phiên bản', dataIndex: 'version', width: 100 },
         { title: 'Cơ quan', dataIndex: 'agency_name', width: 240 },
-        { title: 'File', dataIndex: 'template_path', width: 120, render: (v, r) => v ? <a href={downloadUrl(`/document-templates/${r.id}/download`)} target="_blank" rel="noreferrer">Tải file</a> : '—' },
+        { title: 'File', dataIndex: 'template_path', width: 120, render: (v, r) => v ? <Button size="small" onClick={() => downloadFile(`/document-templates/${r.id}/download`, `${r.code}.${r.file_format || 'docx'}`)}>Tải file</Button> : '—' },
         { title: 'Trạng thái', dataIndex: 'is_active', width: 120, render: v => v ? <Tag color="green">Active</Tag> : <Tag>Inactive</Tag> },
         { title: 'Mặc định', dataIndex: 'is_default', width: 120, render: v => v ? <Tag color="blue">Default</Tag> : '—' },
         { title: 'Thao tác', fixed: 'right', width: 360, render: (_, r) => <Space wrap>
