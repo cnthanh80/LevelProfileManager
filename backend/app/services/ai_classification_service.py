@@ -15,23 +15,23 @@ from app.schemas.ai_classification import AiClassificationInput
 IMPACT_POINTS = {"LOW": 5, "MEDIUM": 15, "HIGH": 25, "CRITICAL": 35}
 
 
+def _contains(text: str, keywords: list[str]) -> bool:
+    value = (text or "").lower()
+    return any(k.lower() in value for k in keywords)
+
 
 def _safe_text(value) -> str:
-    """Convert nullable values to safe strings for NLP/rule-based classification."""
     if value is None:
         return ""
     return str(value).strip()
 
 
-def _safe_join(values: list) -> str:
-    """Join mixed/nullable values without raising TypeError."""
-    return " ".join(_safe_text(v) for v in values if _safe_text(v))
-
-
-
-def _contains(text: str, keywords: list[str]) -> bool:
-    value = (text or "").lower()
-    return any(k.lower() in value for k in keywords)
+def _safe_join(values) -> str:
+    return " ".join(
+        _safe_text(value)
+        for value in values
+        if _safe_text(value)
+    )
 
 
 def _impact_points(value: str | None) -> int:
@@ -137,8 +137,12 @@ def classify_input(payload: AiClassificationInput, current_level: int | None = N
         reasons.append("Lưu lượng giao dịch/ngày lớn.")
         evidence.append(f"transaction_per_day={payload.transaction_per_day}")
 
-    text = " ".join([
-        payload.system_name or "", payload.system_purpose or "", payload.data_description or "", payload.user_groups or "", payload.deployment_model or ""
+    text = _safe_join([
+        payload.system_name,
+        payload.system_purpose,
+        payload.data_description,
+        payload.user_groups,
+        payload.deployment_model,
     ]).lower()
     if _contains(text, ["core", "ngân hàng", "ngan hang", "thanh toán", "thanh toan", "giao dịch", "giao dich"]):
         score += 12
@@ -195,7 +199,6 @@ def classify_input(payload: AiClassificationInput, current_level: int | None = N
 
 def input_from_profile(db: Session, profile: LevelProfile) -> AiClassificationInput:
     system = db.get(InformationSystem, profile.information_system_id)
-
     text = _safe_join([
         system.name if system else None,
         system.purpose if system else None,
@@ -205,7 +208,6 @@ def input_from_profile(db: Session, profile: LevelProfile) -> AiClassificationIn
         system.data_types if system else None,
         system.importance_level if system else None,
         system.deployment_model if system else None,
-        profile.profile_code,
         profile.basis_for_level,
         profile.system_scope_description,
         profile.technical_architecture,
@@ -213,20 +215,12 @@ def input_from_profile(db: Session, profile: LevelProfile) -> AiClassificationIn
         profile.integrity_impact,
         profile.availability_impact,
     ])
-
-    system_name = _safe_text(system.name if system else None) or _safe_text(profile.profile_code) or f"PROFILE-{profile.id}"
-    system_purpose = _safe_text(system.purpose if system else None) or _safe_text(profile.system_scope_description)
-    data_description = _safe_text(system.data_types if system else None) or _safe_text(profile.basis_for_level)
-    user_groups = _safe_text(system.user_groups if system else None) or None
-    deployment_model = _safe_text(system.deployment_model if system else None) or None
-    importance_level = _safe_text(system.importance_level if system else None).upper()
-
     return AiClassificationInput(
-        system_name=system_name,
-        system_purpose=system_purpose,
-        data_description=data_description,
-        user_groups=user_groups,
-        deployment_model=deployment_model,
+        system_name=_safe_text(system.name if system else profile.profile_code),
+        system_purpose=_safe_text(system.purpose if system else profile.system_scope_description),
+        data_description=_safe_text(system.data_types if system else profile.basis_for_level),
+        user_groups=_safe_text(system.user_groups if system else None) or None,
+        deployment_model=_safe_text(system.deployment_model if system else None) or None,
         has_personal_data=_contains(text, ["cá nhân", "ca nhan", "personal", "khách hàng", "khach hang", "công dân", "cong dan"]),
         has_financial_data=_contains(text, ["tài chính", "tai chinh", "giao dịch", "giao dich", "ngân hàng", "ngan hang", "core", "kế toán", "ke toan"]),
         has_sensitive_data=_contains(text, ["nhạy cảm", "nhay cam", "sensitive", "mật", "mat", "nội bộ", "noi bo"]),
@@ -239,7 +233,7 @@ def input_from_profile(db: Session, profile: LevelProfile) -> AiClassificationIn
         confidentiality_impact=_map_impact(profile.confidentiality_impact),
         integrity_impact=_map_impact(profile.integrity_impact),
         availability_impact=_map_impact(profile.availability_impact),
-        business_criticality="HIGH" if importance_level in {"HIGH", "CRITICAL", "CAO", "TRỌNG YẾU"} else "MEDIUM",
+        business_criticality="HIGH" if system and str(system.importance_level or "").upper() in {"HIGH", "CRITICAL", "CAO", "TRỌNG YẾU"} else "MEDIUM",
     )
 
 

@@ -2,7 +2,7 @@ import { Button, Card, Col, Form, Input, Modal, Row, Select, Space, Statistic, T
 import React, { useEffect, useState } from 'react';
 import PageHeader from '../components/PageHeader';
 import JsonView from '../components/JsonView';
-import { api, downloadFile } from '../api/client';
+import { api, downloadUrl } from '../api/client';
 
 function pickItems(x) { return Array.isArray(x?.items) ? x.items : Array.isArray(x) ? x : []; }
 
@@ -64,7 +64,6 @@ export default function DigitalDossierPage({ profiles = [] }) {
     try { setCompareResult(await api.compareProfileVersions(versions[1].id, versions[0].id)); } catch (e) { message.error(e.message); }
   }
 
-  const download = async (path, filename) => { try { const res = await downloadFile(path, filename); message.success(`Đã tải: ${res.filename}`); } catch(e) { message.error(e.message || 'Không tải được tài liệu'); } };
   return <>
     <PageHeader title="Hồ sơ điện tử & ký số" subtitle="Quản lý phiên bản hồ sơ, so sánh thay đổi, ký số mô phỏng và lưu bằng chứng hash." actions={<Space><Button onClick={compareLatest}>So sánh 2 bản mới nhất</Button><Button type="primary" onClick={createVersion}>Tạo phiên bản</Button></Space>} />
     <Card style={{ marginBottom: 16 }}>
@@ -95,7 +94,7 @@ export default function DigitalDossierPage({ profiles = [] }) {
       </Col>
       <Col span={9}>
         <Card title="Timeline ký số">
-          <Timeline items={signatures.map(s => ({ color: 'green', children: <div><b>{s.signer_name}</b> · {s.signer_role}<br/><Tag>{s.sign_method}</Tag> <code>{String(s.signature_hash).slice(0, 12)}...</code><br/><Button size="small" onClick={() => download(`/profile-signatures/${s.id}/download`, `signature-${s.id}.json`)}>Tải bằng chứng ký</Button></div> }))} />
+          <Timeline items={signatures.map(s => ({ color: 'green', children: <div><b>{s.signer_name}</b> · {s.signer_role}<br/><Tag>{s.sign_method}</Tag> <code>{String(s.signature_hash).slice(0, 12)}...</code><br/><a href={downloadUrl(`/profile-signatures/${s.id}/download`)} target="_blank">Tải bằng chứng ký</a></div> }))} />
         </Card>
       </Col>
     </Row>

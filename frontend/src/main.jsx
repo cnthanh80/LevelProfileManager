@@ -10,6 +10,7 @@ import SystemsPage from './pages/SystemsPage';
 import ProfilesPage from './pages/ProfilesPage';
 import CompliancePage from './pages/CompliancePage';
 import DocumentsPage from './pages/DocumentsPage';
+import GovernmentDossierPage from './pages/GovernmentDossierPage';
 import TemplateCenterPage from './pages/TemplateCenterPage';
 import DigitalDossierPage from './pages/DigitalDossierPage';
 import NotificationsPage from './pages/NotificationsPage';
@@ -62,15 +63,6 @@ function App() {
   };
 
   useEffect(() => { load(); }, []);
-  useEffect(() => {
-    const onUnauthorized = () => {
-      clearToken();
-      setUser(null);
-      setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.');
-    };
-    window.addEventListener('lpm:unauthorized', onUnauthorized);
-    return () => window.removeEventListener('lpm:unauthorized', onUnauthorized);
-  }, []);
   useEffect(() => { localStorage.setItem('lpm_active_menu', active); }, [active]);
 
   if (!getToken() || !user) return <ConfigProvider theme={{ algorithm: theme.defaultAlgorithm }}><LoginPage onLogin={load} /></ConfigProvider>;
@@ -82,6 +74,7 @@ function App() {
   if (active === 'compliance') page = <CompliancePage profiles={data.profiles} />;
   if (active === 'ai-classification') page = <AiClassificationPage profiles={data.profiles} />;
   if (active === 'documents') page = <DocumentsPage profiles={data.profiles} />;
+  if (active === 'government-dossier') page = <GovernmentDossierPage profiles={data.profiles} />;
   if (active === 'templates') page = <TemplateCenterPage profiles={data.profiles} />;
   if (active === 'dossier') page = <DigitalDossierPage profiles={data.profiles} />;
   if (active === 'real-signature') page = <RealSignaturePage profiles={data.profiles} />;

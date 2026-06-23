@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
 # Force UTF-8 output for Vietnamese text on Windows PowerShell 5.1 and PowerShell 7+
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -10,7 +10,7 @@ try {
 }
 
 $BaseUrl = "http://localhost:8000"
-Write-Host "Testing LevelProfileManager API v4.2.3..." -ForegroundColor Cyan
+Write-Host "Testing LevelProfileManager API v4.0..." -ForegroundColor Cyan
 
 Invoke-RestMethod "$BaseUrl/api/v1/health" | ConvertTo-Json
 Invoke-RestMethod "$BaseUrl/api/v1/health/db" | ConvertTo-Json
@@ -24,49 +24,12 @@ $tokenResponse = Invoke-RestMethod -Method Post -Uri "$BaseUrl/api/v1/auth/login
 $token = $tokenResponse.access_token
 $headers = @{ Authorization = "Bearer $token" }
 
-function Invoke-LpmJson {
-  param(
-    [Parameter(Mandatory=$true)][string]$Method,
-    [Parameter(Mandatory=$true)][hashtable]$Headers,
-    [Parameter(Mandatory=$true)][string]$Uri,
-    [Parameter(Mandatory=$true)]$Body
-  )
-  if ($Body -is [string]) {
-    $json = $Body
-  } else {
-    $json = $Body | ConvertTo-Json -Depth 20 -Compress
-  }
-  $utf8Body = [System.Text.Encoding]::UTF8.GetBytes($json)
-  return Invoke-RestMethod -Method $Method -Headers $Headers -ContentType "application/json; charset=utf-8" -Uri $Uri -Body $utf8Body
-}
-
-
 Write-Host "Login OK" -ForegroundColor Green
 Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/auth/me" | ConvertTo-Json
 
 Write-Host "Profiles" -ForegroundColor Cyan
 $profiles = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/level-profiles?limit=10"
 $profiles | ConvertTo-Json -Depth 5
-
-Write-Host "Soft Delete Level Profile" -ForegroundColor Cyan
-$systemsForSoftDelete = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/information-systems?limit=1"
-if ($systemsForSoftDelete.items.Count -gt 0) {
-  $softDeleteCode = "UAT-SOFTDELETE-" + (Get-Date -Format "yyyyMMddHHmmss")
-  $softProfile = Invoke-LpmJson -Method "POST" -Headers $headers -Uri "$BaseUrl/api/v1/level-profiles" -Body @{
-    profile_code = $softDeleteCode
-    information_system_id = $systemsForSoftDelete.items[0].id
-    proposed_level = 2
-    status = "DRAFT"
-    basis_for_level = "UAT soft delete test"
-  }
-  Invoke-RestMethod -Method Delete -Headers $headers "$BaseUrl/api/v1/level-profiles/$($softProfile.id)" | Out-Null
-  $archivedProfiles = Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/level-profiles?include_deleted=true&limit=200"
-  $archived = $archivedProfiles.items | Where-Object { $_.id -eq $softProfile.id }
-  if (-not $archived -or -not $archived.is_deleted -or $archived.status -ne "ARCHIVED") {
-    throw "Soft delete level profile test failed"
-  }
-  Invoke-RestMethod -Method Post -Headers $headers "$BaseUrl/api/v1/level-profiles/$($softProfile.id)/restore" | ConvertTo-Json -Depth 5
-}
 
 if ($profiles.items.Count -gt 0) {
   $profileId = $profiles.items[0].id
@@ -775,72 +738,27 @@ Write-Host "Enterprise Release: OK" -ForegroundColor Green
 Write-Host "ALL TESTS PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green
 
-Write-Host "Administration Center v4.2" -ForegroundColor Cyan
+Write-Host "Government Dossier Pack v4.2 / Phase 42.0" -ForegroundColor Cyan
 try {
-  $adminStamp = Get-Date -Format "yyyyMMddHHmmss"
-  $adminRoleBody = @{
-    code = "UAT_ROLE_$adminStamp"
-    name = "Vai trò UAT $adminStamp"
-    description = "Vai trò kiểm thử Administration Center v4.2"
-  } | ConvertTo-Json
-  $newRole = Invoke-LpmJson -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/roles" -Body $adminRoleBody
-  $newRole | ConvertTo-Json -Depth 10
-
-  $adminOrgBody = @{
-    code = "UAT_ORG_$adminStamp"
-    name = "Đơn vị UAT $adminStamp"
-    org_type = "department"
-    description = "Đơn vị kiểm thử Administration Center v4.2"
-    is_active = $true
-    manager_name = "UAT Manager"
-    contact_email = "uat.$adminStamp@example.com"
-  } | ConvertTo-Json
-  $newOrg = Invoke-LpmJson -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/organizations" -Body $adminOrgBody
-  $newOrg | ConvertTo-Json -Depth 10
-
-  $adminUserBody = @{
-    username = "uat_user_$adminStamp"
-    email = "uat.user.$adminStamp@example.com"
-    full_name = "Người dùng UAT $adminStamp"
-    password = "Admin@123"
-    is_active = $true
-    role_id = $newRole.id
-    organization_id = $newOrg.id
-    auth_provider = "LOCAL"
-    is_local_auth_allowed = $true
-  } | ConvertTo-Json
-  $newUser = Invoke-LpmJson -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/users" -Body $adminUserBody
-  $newUser | ConvertTo-Json -Depth 10
-
-  $updateUserBody = @{
-    full_name = "Người dùng UAT đã cập nhật $adminStamp"
-    must_change_password = $true
-  } | ConvertTo-Json
-  Invoke-LpmJson -Method Put -Headers $headers -Uri "$BaseUrl/api/v1/users/$($newUser.id)" -Body $updateUserBody | ConvertTo-Json -Depth 10
-
-  $resetPasswordBody = @{ new_password = "Admin@123"; must_change_password = $true } | ConvertTo-Json
-  Invoke-LpmJson -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/users/$($newUser.id)/reset-password" -Body $resetPasswordBody | ConvertTo-Json -Depth 10
-  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/users/$($newUser.id)/lock" | ConvertTo-Json -Depth 10
-  Invoke-RestMethod -Method Post -Headers $headers -Uri "$BaseUrl/api/v1/users/$($newUser.id)/unlock" | ConvertTo-Json -Depth 10
-
-  $updateOrgBody = @{ description = "Đơn vị UAT đã cập nhật v4.2" } | ConvertTo-Json
-  Invoke-LpmJson -Method Put -Headers $headers -Uri "$BaseUrl/api/v1/organizations/$($newOrg.id)" -Body $updateOrgBody | ConvertTo-Json -Depth 10
-
-  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/users?limit=10" | ConvertTo-Json -Depth 10
-  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/roles?limit=10" | ConvertTo-Json -Depth 10
-  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/organizations/tree" | ConvertTo-Json -Depth 10
-
-  Invoke-RestMethod -Method Delete -Headers $headers -Uri "$BaseUrl/api/v1/users/$($newUser.id)" | Out-Null
-  Invoke-RestMethod -Method Delete -Headers $headers -Uri "$BaseUrl/api/v1/roles/$($newRole.id)" | Out-Null
-  Invoke-RestMethod -Method Delete -Headers $headers -Uri "$BaseUrl/api/v1/organizations/$($newOrg.id)" | Out-Null
-  Write-Host "Administration Center v4.2 OK" -ForegroundColor Green
+  Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dossiers/summary" | ConvertTo-Json -Depth 10
+  if ($profiles.items.Count -gt 0) {
+    $profileId = $profiles.items[0].id
+    $dossierBody = @{ include_evidence = $true; notes = "Phase 42.0 API test" } | ConvertTo-Json
+    $dossier = Invoke-RestMethod -Method Post -Headers $headers -ContentType "application/json" -Uri "$BaseUrl/api/v1/dossiers/$profileId/generate" -Body $dossierBody
+    $dossier | ConvertTo-Json -Depth 10
+    Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dossiers?profile_id=$profileId&limit=10" | ConvertTo-Json -Depth 10
+    Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dossiers/$($dossier.id)" | ConvertTo-Json -Depth 10
+    Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dossiers/$($dossier.id)/files" | ConvertTo-Json -Depth 10
+    Invoke-RestMethod -Headers $headers "$BaseUrl/api/v1/dossiers/$($dossier.id)/download" | Out-Null
+  }
+  Write-Host "Government Dossier Pack v4.2 OK" -ForegroundColor Green
 } catch {
-  Write-Host "Administration Center v4.2 test failed: $($_.Exception.Message)" -ForegroundColor Red
+  Write-Host "Government Dossier Pack v4.2 test failed: $($_.Exception.Message)" -ForegroundColor Red
   throw
 }
 
 Write-Host "======================================" -ForegroundColor Green
-Write-Host "LevelProfileManager API v4.2.1 PASSED" -ForegroundColor Green
-Write-Host "Administration Center: OK" -ForegroundColor Green
+Write-Host "LevelProfileManager API v4.2 PASSED" -ForegroundColor Green
+Write-Host "Government Dossier Pack: OK" -ForegroundColor Green
 Write-Host "ALL TESTS PASSED" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Green

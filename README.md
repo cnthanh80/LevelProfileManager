@@ -36,23 +36,3 @@ powershell.exe -ExecutionPolicy Bypass -File .\scripts\windows-uat-check.ps1
 ## Mục tiêu v4.1
 
 Phase 41 tập trung ổn định UAT, tài liệu hóa, checklist vận hành và chuẩn bị bàn giao dùng thử nội bộ. Không bổ sung thay đổi nghiệp vụ lớn để hạn chế rủi ro phát sinh lỗi mới.
-
-## v4.2 - Administration Center
-
-Bản v4.2 bổ sung năng lực quản trị phục vụ UAT đầy đủ:
-
-- CRUD người dùng qua API và giao diện.
-- Khóa/mở khóa user.
-- Reset mật khẩu user.
-- Gán user vào vai trò và đơn vị.
-- CRUD vai trò.
-- Quản lý cây đơn vị/tổ chức.
-- Giao diện Administration Center trong menu **Quản trị**.
-
-Kiểm thử:
-
-```powershell
-Get-ChildItem -Recurse *.ps1 | Unblock-File
-docker compose up -d --build
-powershell.exe -ExecutionPolicy Bypass -File .\scripts\windows-test-api.ps1
-```

@@ -1,11 +1,10 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import enterprise_center, enterprise_reporting, compliance_monitoring, compliance_automation, siem_integration, identity_provider, cmdb, assessment_workflow, assessment_portal, digital_dossier, real_signature, access_control, ai_classification, audit_logs, auth, checklists, compliance, dashboard, document_templates, enterprise_dashboard, executive_dashboard_v2, evidence_documents, exported_documents, health, information_systems, level_profiles, notifications, organizations, risk_register, security_requirements, security_hardening, system, users, roles, workflow, periodic_reviews, release
+from app.api.v1.endpoints import government_dossiers, enterprise_center, enterprise_reporting, compliance_monitoring, compliance_automation, siem_integration, identity_provider, cmdb, assessment_workflow, assessment_portal, digital_dossier, real_signature, access_control, ai_classification, audit_logs, auth, checklists, compliance, dashboard, document_templates, enterprise_dashboard, executive_dashboard_v2, evidence_documents, exported_documents, health, information_systems, level_profiles, notifications, organizations, risk_register, security_requirements, security_hardening, system, users, workflow, periodic_reviews, release
 
 api_router = APIRouter()
 api_router.include_router(health.router, prefix="/health", tags=["health"])
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(users.router, prefix="/users", tags=["users"])
-api_router.include_router(roles.router, prefix="/roles", tags=["roles"])
 api_router.include_router(organizations.router, prefix="/organizations", tags=["organizations"])
 api_router.include_router(information_systems.router, prefix="/information-systems", tags=["information-systems"])
 api_router.include_router(level_profiles.router, prefix="/level-profiles", tags=["level-profiles"])
@@ -62,3 +61,5 @@ api_router.include_router(compliance_monitoring.router, tags=["compliance-monito
 api_router.include_router(enterprise_reporting.router, tags=["enterprise-reporting", "data-warehouse"])
 
 api_router.include_router(enterprise_center.router, tags=["enterprise-center", "enterprise-release-v4"])
+
+api_router.include_router(government_dossiers.router, tags=["government-dossier-pack", "government-documents"])

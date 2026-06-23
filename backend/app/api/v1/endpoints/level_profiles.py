@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
@@ -21,15 +20,12 @@ def list_level_profiles(
     information_system_id: int | None = Query(default=None),
     proposed_level: int | None = Query(default=None, ge=1, le=5),
     status_value: str | None = Query(default=None, alias="status"),
-    include_deleted: bool = Query(default=False),
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
 ):
     stmt = select(LevelProfile)
     count_stmt = select(func.count()).select_from(LevelProfile)
     filters = []
-    if not include_deleted:
-        filters.append(LevelProfile.is_deleted == False)
 
     if q:
         filters.append(LevelProfile.profile_code.ilike(f"%{q}%"))
@@ -67,7 +63,7 @@ def create_level_profile(payload: LevelProfileCreate, db: Session = Depends(get_
 @router.get("/{profile_id}", response_model=LevelProfileRead)
 def get_level_profile(profile_id: int, db: Session = Depends(get_db)):
     item = db.get(LevelProfile, profile_id)
-    if not item or item.is_deleted:
+    if not item:
         raise HTTPException(status_code=404, detail="Level profile not found")
     return item
 
@@ -75,7 +71,7 @@ def get_level_profile(profile_id: int, db: Session = Depends(get_db)):
 @router.put("/{profile_id}", response_model=LevelProfileRead)
 def update_level_profile(profile_id: int, payload: LevelProfileUpdate, db: Session = Depends(get_db), current_user=Depends(require_roles("ADMIN", "SECURITY_OFFICER"))):
     item = db.get(LevelProfile, profile_id)
-    if not item or item.is_deleted:
+    if not item:
         raise HTTPException(status_code=404, detail="Level profile not found")
     data = payload.model_dump(exclude_unset=True)
     if "information_system_id" in data and db.get(InformationSystem, data["information_system_id"]) is None:
@@ -92,33 +88,10 @@ def update_level_profile(profile_id: int, payload: LevelProfileUpdate, db: Sessi
 
 
 @router.delete("/{profile_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_level_profile(profile_id: int, db: Session = Depends(get_db), current_user=Depends(require_roles("ADMIN", "SECURITY_OFFICER"))):
-    item = db.get(LevelProfile, profile_id)
-    if not item or item.is_deleted:
-        raise HTTPException(status_code=404, detail="Level profile not found")
-    if item.status != "DRAFT":
-        raise HTTPException(status_code=400, detail="Only DRAFT level profiles can be archived")
-
-    # Soft delete instead of hard delete to preserve workflow history, audit logs, checklist, evidence, signatures and reports.
-    item.is_deleted = True
-    item.deleted_at = datetime.now(timezone.utc)
-    item.deleted_by = getattr(current_user, "id", None)
-    item.status = "ARCHIVED"
-    db.commit()
-    return None
-
-
-@router.post("/{profile_id}/restore", response_model=LevelProfileRead)
-def restore_level_profile(profile_id: int, db: Session = Depends(get_db), current_user=Depends(require_roles("ADMIN"))):
+def delete_level_profile(profile_id: int, db: Session = Depends(get_db)):
     item = db.get(LevelProfile, profile_id)
     if not item:
         raise HTTPException(status_code=404, detail="Level profile not found")
-    if not item.is_deleted:
-        return item
-    item.is_deleted = False
-    item.deleted_at = None
-    item.deleted_by = None
-    item.status = "DRAFT"
+    db.delete(item)
     db.commit()
-    db.refresh(item)
-    return item
+    return None

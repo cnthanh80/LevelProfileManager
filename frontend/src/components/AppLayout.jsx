@@ -16,6 +16,7 @@ export default function AppLayout({ active, setActive, children, user }) {
     { key: 'compliance', icon: <SafetyCertificateOutlined />, label: 'Compliance Engine' },
     { key: 'ai-classification', icon: <RobotOutlined />, label: 'AI gợi ý cấp độ' },
     { key: 'documents', icon: <FileTextOutlined />, label: 'Tài liệu/Xuất hồ sơ' },
+    { key: 'government-dossier', icon: <FileDoneOutlined />, label: 'Government Dossier Pack' },
     { key: 'templates', icon: <SnippetsOutlined />, label: 'Kho biểu mẫu' },
     { key: 'dossier', icon: <SignatureOutlined />, label: 'Hồ sơ điện tử/Ký số' },
     { key: 'real-signature', icon: <SafetyCertificateOutlined />, label: 'Ký số thực tế' },

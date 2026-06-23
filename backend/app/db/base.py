@@ -35,3 +35,5 @@ from app.models.compliance_monitoring import ComplianceSnapshot, ComplianceMonit
 from app.models.enterprise_reporting import EnterpriseReportSnapshot, DataWarehouseMetric, ReportExportJob  # noqa
 
 from app.models.enterprise_center import EnterpriseConfiguration, EnterpriseHealthCheck, EnterpriseJobSchedule, DataRetentionPolicy, BackupRecord  # noqa
+
+from app.models.government_dossier import GovernmentDossier, GovernmentDossierFile  # noqa

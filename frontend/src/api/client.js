@@ -1,9 +1,9 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
 
 export function getToken() { return localStorage.getItem('lpm_token'); }
-export function hasToken() { return !!getToken(); }
 export function setToken(token) { localStorage.setItem('lpm_token', token); }
 export function clearToken() { localStorage.removeItem('lpm_token'); }
+export function hasToken() { return !!getToken(); }
 
 async function parseResponse(response) {
   const contentType = response.headers.get('content-type') || '';
@@ -41,7 +41,6 @@ export async function login(username, password) {
 
 export function downloadUrl(path) { return `${API_BASE_URL}${path}`; }
 
-
 function getFilenameFromContentDisposition(disposition) {
   if (!disposition) return null;
   const utf8Match = disposition.match(/filename\*=UTF-8''([^;]+)/i);
@@ -70,8 +69,8 @@ export async function downloadFile(path, suggestedFilename) {
       }
     } catch {}
     if (response.status === 401) {
-      message = 'Phiên đăng nhập đã hết hạn hoặc thiếu quyền tải tài liệu. Vui lòng đăng nhập lại.';
       clearToken();
+      message = 'Phiên đăng nhập đã hết hạn hoặc thiếu quyền tải tài liệu. Vui lòng đăng nhập lại.';
     }
     throw new Error(message);
   }
@@ -88,6 +87,7 @@ export async function downloadFile(path, suggestedFilename) {
   return { filename, size: blob.size };
 }
 
+
 function page(path, params = {}) {
   const search = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== null && v !== '') search.append(k, v); });
@@ -96,19 +96,8 @@ function page(path, params = {}) {
 
 export const api = {
   me: () => request('/auth/me'),
-  roles: (params) => page('/roles', params),
-  createRole: (payload) => request('/roles', { method: 'POST', body: JSON.stringify(payload) }),
-  updateRole: (id, payload) => request(`/roles/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
-  deleteRole: (id) => request(`/roles/${id}`, { method: 'DELETE' }),
+  roles: () => request('/auth/roles'),
   identityProviderStatus: () => request('/auth/identity-provider/status'),
-
-  users: (params) => page('/users', params),
-  createUser: (payload) => request('/users', { method: 'POST', body: JSON.stringify(payload) }),
-  updateUser: (id, payload) => request(`/users/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
-  deleteUser: (id) => request(`/users/${id}`, { method: 'DELETE' }),
-  lockUser: (id) => request(`/users/${id}/lock`, { method: 'POST' }),
-  unlockUser: (id) => request(`/users/${id}/unlock`, { method: 'POST' }),
-  resetUserPassword: (id, payload) => request(`/users/${id}/reset-password`, { method: 'POST', body: JSON.stringify(payload) }),
 
   identityProductionReadiness: () => request('/identity-provider/production-readiness'),
   ldapTestConnection: (payload) => request('/identity-provider/ldap/test-connection', { method: 'POST', body: JSON.stringify(payload || {}) }),
@@ -148,7 +137,6 @@ export const api = {
   createProfile: (payload) => request('/level-profiles', { method: 'POST', body: JSON.stringify(payload) }),
   updateProfile: (id, payload) => request(`/level-profiles/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
   deleteProfile: (id) => request(`/level-profiles/${id}`, { method: 'DELETE' }),
-  restoreProfile: (id) => request(`/level-profiles/${id}/restore`, { method: 'POST' }),
 
   securityRequirements: (params) => page('/security-requirements', params),
   requirementsByLevel: (level) => request(`/security-requirements/by-level/${level}`),
@@ -277,16 +265,10 @@ export const api = {
   deleteCmdbAsset: (id) => request(`/cmdb-assets/${id}`, { method: 'DELETE' }),
   cmdbApplications: (params) => page('/cmdb-applications', params),
   createCmdbApplication: (payload) => request('/cmdb-applications', { method: 'POST', body: JSON.stringify(payload) }),
-  updateCmdbApplication: (id, payload) => request(`/cmdb-applications/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
-  deleteCmdbApplication: (id) => request(`/cmdb-applications/${id}`, { method: 'DELETE' }),
   cmdbDatabases: (params) => page('/cmdb-databases', params),
   createCmdbDatabase: (payload) => request('/cmdb-databases', { method: 'POST', body: JSON.stringify(payload) }),
-  updateCmdbDatabase: (id, payload) => request(`/cmdb-databases/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
-  deleteCmdbDatabase: (id) => request(`/cmdb-databases/${id}`, { method: 'DELETE' }),
   cmdbNetworkDevices: (params) => page('/cmdb-network-devices', params),
   createCmdbNetworkDevice: (payload) => request('/cmdb-network-devices', { method: 'POST', body: JSON.stringify(payload) }),
-  updateCmdbNetworkDevice: (id, payload) => request(`/cmdb-network-devices/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
-  deleteCmdbNetworkDevice: (id) => request(`/cmdb-network-devices/${id}`, { method: 'DELETE' }),
   cmdbImportAssets: (payload) => request('/cmdb/import/assets', { method: 'POST', body: JSON.stringify(payload) }),
   cmdbProfileInventory: (profileId) => request(`/profiles/${profileId}/cmdb-inventory`),
   cmdbSyncProfile: (profileId) => request(`/profiles/${profileId}/cmdb-sync`, { method: 'POST' }),
@@ -333,7 +315,7 @@ export const api = {
   generateEnterpriseReportSnapshot: (payload) => request('/enterprise-reporting/snapshots/generate', { method: 'POST', body: JSON.stringify(payload || {}) }),
   enterpriseReportSnapshots: (params) => page('/enterprise-reporting/snapshots', params),
   enterpriseDataWarehouseMetrics: (params) => page('/enterprise-reporting/data-warehouse/metrics', params),
-  enterprisePortfolioCsvUrl: () => '/enterprise-reporting/export/portfolio-csv',
+  enterprisePortfolioCsvUrl: () => downloadUrl('/enterprise-reporting/export/portfolio-csv'),
 
   enterpriseCenterDashboard: () => request('/enterprise-center/dashboard'),
   enterpriseSeedDefaults: () => request('/enterprise-center/seed-defaults', { method: 'POST' }),
@@ -345,5 +327,13 @@ export const api = {
   enterpriseBackups: (params) => page('/enterprise-center/backups', params),
   enterpriseCreateMockBackup: (payload) => request('/enterprise-center/backups/mock', { method: 'POST', body: JSON.stringify(payload) }),
   enterpriseValidateBackup: (id) => request(`/enterprise-center/backups/${id}/validate`, { method: 'POST' }),
+
+  governmentDossierSummary: () => request('/dossiers/summary'),
+  governmentDossiers: (params) => page('/dossiers', params),
+  governmentDossier: (id) => request(`/dossiers/${id}`),
+  generateGovernmentDossierPack: (profileId, payload) => request(`/dossiers/${profileId}/generate`, { method: 'POST', body: JSON.stringify(payload || {}) }),
+  regenerateGovernmentDossierPack: (dossierId, payload) => request(`/dossiers/${dossierId}/regenerate`, { method: 'POST', body: JSON.stringify(payload || {}) }),
+  governmentDossierFiles: (dossierId) => request(`/dossiers/${dossierId}/files`),
+  deleteGovernmentDossier: (id) => request(`/dossiers/${id}`, { method: 'DELETE' }),
 
 };

@@ -76,34 +76,3 @@ class SsoLoginHint(BaseModel):
     provider_name: str
     login_url: str | None = None
     message: str
-
-
-class UserUpdate(BaseModel):
-    username: str | None = None
-    password: str | None = None
-    full_name: str | None = None
-    email: EmailStr | None = None
-    role_id: int | None = None
-    organization_id: int | None = None
-    is_active: bool | None = None
-    auth_provider: str | None = None
-    external_id: str | None = None
-    is_local_auth_allowed: bool | None = None
-    must_change_password: bool | None = None
-
-
-class UserResetPasswordRequest(BaseModel):
-    new_password: str
-    must_change_password: bool = True
-
-
-class RoleCreate(BaseModel):
-    code: str
-    name: str
-    description: str | None = None
-
-
-class RoleUpdate(BaseModel):
-    code: str | None = None
-    name: str | None = None
-    description: str | None = None

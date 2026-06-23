@@ -1,4 +1,4 @@
-import { Button, Checkbox, Drawer, Form, Input, InputNumber, Modal, Select, Space, Tabs, message } from 'antd';
+import { Button, Drawer, Form, Input, InputNumber, Modal, Select, Space, Tabs, message } from 'antd';
 import React, { useState } from 'react';
 import DataTable from '../components/DataTable';
 import PageHeader from '../components/PageHeader';
@@ -11,14 +11,13 @@ export default function ProfilesPage({ items, systems, reload }) {
   const startCreate = () => { setEditing(null); form.resetFields(); form.setFieldsValue({ status: 'DRAFT', proposed_level: 2, information_system_id: systems?.[0]?.id }); setOpen(true); };
   const startEdit = (r) => { setEditing(r); form.setFieldsValue(r); setOpen(true); };
   const submit = async () => { const values = await form.validateFields(); editing ? await api.updateProfile(editing.id, values) : await api.createProfile(values); message.success('Đã lưu hồ sơ'); setOpen(false); reload(); };
-  const remove = (r) => Modal.confirm({ title: 'Lưu trữ hồ sơ?', content: `${r.profile_code} sẽ được ẩn khỏi danh sách mặc định nhưng vẫn giữ lịch sử workflow/audit.`, okText: 'Lưu trữ', onOk: async () => { await api.deleteProfile(r.id); message.success('Đã lưu trữ hồ sơ'); reload(); } });
-  const restore = (r) => Modal.confirm({ title: 'Khôi phục hồ sơ?', content: r.profile_code, okText: 'Khôi phục', onOk: async () => { await api.restoreProfile(r.id); message.success('Đã khôi phục hồ sơ'); reload(); } });
+  const remove = (r) => Modal.confirm({ title: 'Xóa hồ sơ?', content: r.profile_code, onOk: async () => { await api.deleteProfile(r.id); message.success('Đã xóa'); reload(); } });
   return <>
-    <PageHeader title="Hồ sơ đề xuất cấp độ" subtitle="Quản lý vòng đời hồ sơ: tạo, checklist, minh chứng, workflow, xuất tài liệu. Xóa hồ sơ được thực hiện theo cơ chế lưu trữ mềm để bảo toàn lịch sử." actions={<Button type="primary" onClick={startCreate}>Tạo hồ sơ</Button>} />
+    <PageHeader title="Hồ sơ đề xuất cấp độ" subtitle="Quản lý vòng đời hồ sơ: tạo, checklist, minh chứng, workflow, xuất tài liệu." actions={<Button type="primary" onClick={startCreate}>Tạo hồ sơ</Button>} />
     <DataTable data={items} columns={[
       { title: 'Mã hồ sơ', dataIndex: 'profile_code', fixed: 'left' }, { title: 'HTTT ID', dataIndex: 'information_system_id' },
       { title: 'Cấp độ', dataIndex: 'proposed_level', render: (v) => `Cấp ${v}` }, { title: 'Trạng thái', dataIndex: 'status', render: (v) => <StatusTag value={v} /> },
-      { title: 'Thao tác', width: 280, render: (_, r) => <Space><Button type="primary" onClick={() => setSelected(r)}>Mở hồ sơ</Button><Button onClick={() => startEdit(r)}>Sửa</Button>{r.is_deleted ? <Button onClick={() => restore(r)}>Khôi phục</Button> : <Button danger onClick={() => remove(r)}>Lưu trữ</Button>}</Space> }
+      { title: 'Thao tác', width: 280, render: (_, r) => <Space><Button type="primary" onClick={() => setSelected(r)}>Mở hồ sơ</Button><Button onClick={() => startEdit(r)}>Sửa</Button><Button danger onClick={() => remove(r)}>Xóa</Button></Space> }
     ]} />
     <Drawer title={editing ? 'Cập nhật hồ sơ' : 'Tạo hồ sơ'} open={open} onClose={() => setOpen(false)} width={760} extra={<Button type="primary" onClick={submit}>Lưu</Button>}>
       <Form form={form} layout="vertical">
